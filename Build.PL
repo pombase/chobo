@@ -1,0 +1,21 @@
+use 5.006;
+use strict;
+use warnings;
+use Module::Build;
+
+my $builder = Module::Build->new(
+    module_name         => 'PomBase::Chobo',
+    license             => 'perl',
+    dist_author         => q{Kim Rutherford <kmr@pombase.org>},
+    dist_version_from   => 'lib/PomBase/Chobo.pm',
+    build_requires => {
+        'Test::More' => 0,
+    },
+    requires => {
+        'perl' => 5.006,
+    },
+    add_to_cleanup      => [ 'PomBase-Chobo-*' ],
+    create_makefile_pl => 'traditional',
+);
+
+$builder->create_build_script();
