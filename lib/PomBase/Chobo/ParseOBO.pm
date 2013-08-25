@@ -39,6 +39,8 @@ under the same terms as Perl itself.
 use Moose;
 use FileHandle;
 
+use PomBase::Chobo::OntologyData;
+
 has terms => (is => 'rw', init_arg => undef);
 
 my %field_conf = (
@@ -113,10 +115,54 @@ sub _save_stanza_line
       if (defined $field_conf->{type} && $field_conf->{type} eq 'SINGLE') {
         $stanza->{$field_name} = $field_value;
       } else {
-        push @{$stanza->{$field_name}}, $field_value;
+        push @{$stanza->{$field_name . 's'}}, $field_value;
       }
     }
   }
+}
+
+sub _clean_line
+{
+  my $line_ref = shift;
+
+  chomp $$line_ref;
+  $$line_ref =~ s/!.*//;
+  $$line_ref =~ s/^\s+//;
+  $$line_ref =~ s/\s+$//;
+}
+
+sub _finish_stanza
+{
+  my $current = shift;
+  my $terms_ref = shift;
+  my $relations_ref = shift;
+  my $metadata_ref = shift;
+
+  if (!defined $current->{id}) {
+    warn "stanza at line ", $current->{line}, " has no id: - skipped\n";
+    return;
+  }
+  if (!defined $current->{name}) {
+    warn "stanza at line ", $current->{line}, " has no name: - skipped\n";
+    return;
+  }
+
+  if (!defined $current->{namespace}) {
+    $current->{namespace} = $metadata_ref->{'default-namespace'};
+  }
+
+  if ($current->{is_relationshiptype}) {
+    push @$relations_ref, $current;
+  } else {
+    push @$terms_ref, $current;
+  }
+}
+
+sub fatal
+{
+  my $message = shift;
+
+  die "fatal: $message\n";
 }
 
 sub parse
@@ -126,7 +172,9 @@ sub parse
 
   my $filename = $args{filename};
 
+  my %metadata = ();
   my @terms = ();
+  my @relations = ();
 
   my $current = undef;
   my @synonyms = ();
@@ -136,22 +184,15 @@ sub parse
   my $fh = FileHandle->new($filename, 'r') or die "can't open $filename: $!";
 
   while (defined (my $line = <$fh>)) {
-    chomp $line;
+    _clean_line(\$line);
 
-    $line =~ s/!.*//;
+    next if length $line == 0;
 
-    if ($line =~ /^\s*\[(.*)\]\s*$/) {
+    if ($line =~ /^\[(.*)\]$/) {
       my $stanza_type = $1;
 
       if (defined $current) {
-        if (!defined $current->{id}) {
-          warn "[$stanza_type] at line ", $current->{line}, " has no id: - skipped\n";
-        }
-        if (defined $current->{name}) {
-          push @terms, $current;
-        } else {
-          warn "[$stanza_type] at line ", $current->{line}, " has no name: - skipped\n";
-        }
+        _finish_stanza($current, \@terms, \@relations, \%metadata);
       }
 
       my $is_relationshiptype = 0;
@@ -169,15 +210,30 @@ sub parse
     } else {
       if ($current) {
         _save_stanza_line($current, $line);
+      } else {
+        if ($line =~ /^(.+?):\s*(.*)/) {
+          if (defined $metadata{$1}) {
+            fatal qq(metadata key "$1" occurs more than once in header);
+          }
+          $metadata{$1} = $2;
+        } else {
+          fatal "can't parse header line: $line";
+        }
       }
     }
+  }
+
+  if (defined $current) {
+    _finish_stanza($current, \@terms, \@relations, \%metadata);
   }
 
   close $fh or die "can't close $filename: $!";
 
   $self->terms(\@terms);
 
-  return { terms => \@terms };
+  return PomBase::Chobo::OntologyData->new(metadata => \%metadata,
+                                           terms => \@terms,
+                                           relations => \@relations);
 }
 
 1;
