@@ -115,7 +115,7 @@ sub _save_stanza_line
       if (defined $field_conf->{type} && $field_conf->{type} eq 'SINGLE') {
         $stanza->{$field_name} = $field_value;
       } else {
-        push @{$stanza->{$field_name . 's'}}, $field_value;
+        push @{$stanza->{$field_name . '_list'}}, $field_value;
       }
     }
   }
