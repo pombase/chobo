@@ -165,6 +165,12 @@ sub fatal
   die "fatal: $message\n";
 }
 
+my %interesting_metadata = (
+  'default-namespace' => 1,
+  'ontology' => 1,
+  'date' => 1,
+);
+
 sub parse
 {
   my $self = shift;
@@ -212,10 +218,14 @@ sub parse
         _save_stanza_line($current, $line);
       } else {
         if ($line =~ /^(.+?):\s*(.*)/) {
-          if (defined $metadata{$1}) {
-            fatal qq(metadata key "$1" occurs more than once in header);
+          my ($key, $value) = ($1, $2);
+
+          if ($interesting_metadata{$key}) {
+            if (defined $metadata{$key}) {
+              fatal qq(metadata key "$key" occurs more than once in header);
+            }
+            $metadata{$key} = $value;
           }
-          $metadata{$1} = $2;
         } else {
           fatal "can't parse header line: $line";
         }
