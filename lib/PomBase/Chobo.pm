@@ -67,7 +67,6 @@ sub process
 
   my $dbh = $self->dbh();
 
-  $dbh->do("DROP TABLE IF EXISTS $terms_table");
   $dbh->do("CREATE TEMPORARY TABLE $terms_table (local_id integer PRIMARY KEY, cvterm_id integer, name text, db_name text, accession text, dbxref_id integer)")
     or die "can't create temporary table $terms_table";
   $dbh->do("COPY $terms_table FROM STDIN");
