@@ -116,8 +116,6 @@ sub _get_by_copy
 
   my $column_names = join ',', @column_names;
 
-  warn "COPY @column_names -  $column_names\n";
-
   $dbh->do("COPY $table_name($column_names) TO STDOUT")
     or die "failed to COPY $table_name: ", $dbh->errstr, "\n";
 
@@ -143,7 +141,7 @@ sub _get_cvterms
 {
   my $self = shift;
 
-  my @column_names = qw(cvterm_id name cv_id dbxref_id is_obsolete);
+  my @column_names = qw(cvterm_id name cv_id dbxref_id is_obsolete is_relationshiptype);
 
   my %by_id = ();
   my %by_cv_id = ();
@@ -152,7 +150,8 @@ sub _get_cvterms
   my $proc = sub {
     my $fields_ref = shift;
     my @fields = @$fields_ref;
-    my ($cvterm_id, $name, $cv_id, $dbxref_id, $is_obsolete) = @fields;
+    my ($cvterm_id, $name, $cv_id, $dbxref_id, $is_obsolete,
+        $is_relationshiptype) = @fields;
     $by_id{$cvterm_id} = \@fields;
     $by_cv_id{$cv_id}->{$name} = \@fields;
     $by_dbxref_id{$dbxref_id} = \@fields;
