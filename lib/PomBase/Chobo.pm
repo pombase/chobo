@@ -86,4 +86,4 @@ sub process
   $dbh->pg_putcopyend();
 }
 
-1; # End of PomBase::Chobo
+1;
