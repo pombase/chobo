@@ -41,12 +41,17 @@ has dbh => (is => 'ro');
 
 has cvs_by_cv_id => (is => 'rw', init_arg => undef);
 has cvs_by_cv_name => (is => 'rw', init_arg => undef);
+
 has dbs_by_db_id => (is => 'rw', init_arg => undef);
 has dbs_by_db_name => (is => 'rw', init_arg => undef);
+
 has cvterms_by_cvterm_id => (is => 'rw', init_arg => undef);
 has cvterms_by_cv_id => (is => 'rw', init_arg => undef);
 has cvterms_by_dbxref_id => (is => 'rw', init_arg => undef);
 has cvterms_by_termid => (is => 'rw', init_arg => undef);
+
+has cvtermsynonyms_by_cvterm_id => (is => 'rw', init_arg => undef);
+
 has dbxrefs_by_dbxref_id => (is => 'rw', init_arg => undef);
 has dbxrefs_by_termid => (is => 'rw', init_arg => undef);
 
@@ -195,6 +200,27 @@ sub _get_dbxrefs
   return \%by_id, \%by_termid;
 }
 
+sub _get_cvtermsynonyms
+{
+  my $self = shift;
+
+  my $dbh = $self->dbh();
+
+  my @column_names = qw(cvtermsynonym_id cvterm_id synonym type_id);
+
+  my %by_cvterm_id = ();
+
+  my $proc = sub {
+    my $fields_ref = shift;
+    my @fields = @$fields_ref;
+    my ($cvtermsynonym_id, $cvterm_id, $synonym, $type_id) = @fields;
+    $by_cvterm_id{$cvterm_id} = \@fields;
+  };
+
+  $self->_get_by_copy('cvtermsynonym', \@column_names, $proc);
+
+  return \%by_cvterm_id
+}
 
 sub BUILD
 {
@@ -213,6 +239,10 @@ sub BUILD
   $self->cvterms_by_cvterm_id($cvterms_by_cvterm_id);
   $self->cvterms_by_cv_id($cvterms_by_cv_id);
   $self->cvterms_by_dbxref_id($cvterms_by_dbxref_id);
+
+  my ($cvtermsynonyms_by_cvterm_id) =
+    $self->_get_cvtermsynonyms();
+  $self->cvtermsynonyms_by_cvterm_id($cvtermsynonyms_by_cvterm_id);
 
   my ($dbxrefs_by_dbxref_id, $dbxrefs_by_termid) =
     $self->_get_dbxrefs($dbs_by_db_id);
