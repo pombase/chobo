@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-use Moose;
+use Mouse;
 use Try::Tiny;
 
 use DBI;

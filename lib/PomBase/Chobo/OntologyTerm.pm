@@ -35,7 +35,7 @@ under the same terms as Perl itself.
 
 =cut
 
-use Moose;
+use Mouse;
 
 has id => (is => 'ro', isa => 'Str');
 has name => (is => 'ro', isa => 'Str');

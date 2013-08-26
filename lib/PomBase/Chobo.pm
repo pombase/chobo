@@ -40,7 +40,7 @@ See http://dev.perl.org/licenses/ for more information.
 
 =cut
 
-use Moose;
+use Mouse;
 use Text::CSV;
 
 use PomBase::Chobo::ParseOBO;

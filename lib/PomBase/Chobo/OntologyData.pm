@@ -38,7 +38,7 @@ under the same terms as Perl itself.
 
 =cut
 
-use Moose;
+use Mouse;
 
 use PomBase::Chobo::OntologyTerm;
 
