@@ -13,6 +13,11 @@ my $builder = Module::Build->new(
     },
     requires => {
         'perl' => 5.006,
+        'Text::CSV_XS' => 0,
+        'DBI' => 0,
+        'DBD::Pg' => 0,
+        'Try::Tiny' => 0,
+        'Mouse' => 0,
     },
     add_to_cleanup      => [ 'PomBase-Chobo-*' ],
     create_makefile_pl => 'traditional',
