@@ -180,63 +180,6 @@ sub _get_by_copy
       die "couldn't parse this line as tab separated values: $line\n";
     }
   }
-
-  warn "COPY finished\n";
-}
-
-
-sub _get_cvterms
-{
-  my $self = shift;
-
-  my %by_id = ();
-  my %by_cv_id = ();
-  my %by_dbxref_id = ();
-
-  my $proc = sub {
-    my $fields_ref = shift;
-    my @fields = @$fields_ref;
-    my ($cvterm_id, $name, $cv_id, $dbxref_id, $is_obsolete,
-        $is_relationshiptype) = @fields;
-    $by_id{$cvterm_id} = \@fields;
-    $by_cv_id{$cv_id}->{$name} = \@fields;
-    $by_dbxref_id{$dbxref_id} = \@fields;
-  };
-
-  $self->_get_by_copy('cvterm', \@cvterm_column_names, $proc);
-
-  return \%by_id, \%by_cv_id, \%by_dbxref_id;
-}
-
-sub _get_dbxrefs
-{
-  my $self = shift;
-  my $dbs_by_id = shift;
-
-  my %db_id_names = map { ($_, $dbs_by_id->{$_}->{name}) } keys %$dbs_by_id;
-
-  my $dbh = $self->dbh();
-
-  my %by_id = ();
-  my %by_termid = ();
-
-  my $proc = sub {
-    my $fields_ref = shift;
-    my @fields = @$fields_ref;
-    my ($dbxref_id, $db_id, $accession, $version) = @fields;
-    $by_id{$dbxref_id} = \@fields;
-    my $db_name = $db_id_names{$db_id};
-    if (!defined $db_name) {
-      die "no db name for db $db_id";
-    }
-    my $termid = "$db_name:$accession";
-    push @fields, $termid;
-    $by_termid{$termid} = \@fields;
-  };
-
-  $self->_get_by_copy('dbxref', \@dbxref_column_names, $proc);
-
-  return \%by_id, \%by_termid;
 }
 
 sub _get_cvtermsynonyms
@@ -265,72 +208,126 @@ sub _build_cvterm_data
 {
   my $self = shift;
 
-warn "_build_cvterm_data()\n";
+  my %by_cvterm_id = ();
+  my %by_cv_id = ();
+  my %by_dbxref_id = ();
 
-  my $dbxrefs_by_termid = $self->get_dbxrefs_by_termid();
+  my $proc = sub {
+    my $fields_ref = shift;
+    my @fields = @$fields_ref;
+    my ($cvterm_id, $name, $cv_id, $dbxref_id, $is_obsolete,
+        $is_relationshiptype) = @fields;
+    $by_cvterm_id{$cvterm_id} = \@fields;
+    $by_cv_id{$cv_id}->{$name} = \@fields;
+    $by_dbxref_id{$dbxref_id} = \@fields;
+  };
 
-  my ($cvterms_by_cvterm_id, $cvterms_by_cv_id, $cvterms_by_dbxref_id) =
-    $self->_get_cvterms();
-  my %cvterms_by_termid = map {
-    my $dbxref_id = $dbxrefs_by_termid->{$_}->[0];
-    my $cvterm_data = $cvterms_by_dbxref_id->{$dbxref_id};
+  $self->_get_by_copy('cvterm', \@cvterm_column_names, $proc);
+
+  my $dbxref_by_termid = $self->dbxref_data()->{by_termid};
+
+  my %by_termid = map {
+    my $dbxref_id = $dbxref_by_termid->{$_}->[0];
+    my $cvterm_data = $by_dbxref_id{$dbxref_id};
     if (defined $cvterm_data) {
       ($_, $cvterm_data);
     } else {
       ();
     }
-  } keys %$dbxrefs_by_termid;
+  } $self->get_all_termids();
 
   return {
-    by_cvterm_id => $cvterms_by_cvterm_id,
-    by_cv_id => $cvterms_by_cv_id,
-    by_dbxref_id => $cvterms_by_dbxref_id,
-    by_termid => \%cvterms_by_termid,
+    by_cvterm_id => \%by_cvterm_id,
+    by_cv_id => \%by_cv_id,
+    by_dbxref_id => \%by_dbxref_id,
+    by_termid => \%by_termid,
   };
 }
 
-sub cvterms_by_cvterm_id
+sub get_cvterm_by_cvterm_id
 {
   my $self = shift;
 
   return $self->cvterm_data()->{by_cvterm_id};
 }
 
-sub cvterms_by_cv_id
+sub get_cvterms_by_cv_id
 {
   my $self = shift;
+  my $cv_id = shift;
 
-  return $self->cvterm_data()->{by_cv_id};
+  return $self->cvterm_data()->{by_cv_id}->{$cv_id};
 }
 
-sub cvterms_by_dbxref_id
+sub get_cvterm_by_dbxref_id
 {
   my $self = shift;
+  my $dbxref_id = shift;
 
-  return $self->cvterm_data()->{by_dbxref_id};
+  return $self->cvterm_data()->{by_dbxref_id}->{$dbxref_id};
 }
 
-sub cvterms_by_termid
+sub get_cvterm_by_termid
+{
+  my $self = shift;
+  my $termid = shift;
+
+  return $self->cvterm_data()->{by_termid}->{$termid};
+}
+
+sub get_all_termids
 {
   my $self = shift;
 
-  return $self->cvterm_data()->{by_termid};
+  return keys %{$self->dbxref_data()->{by_termid}};
+}
+
+sub get_dbxref_by_dbxref_id
+{
+  my $self = shift;
+  my $dbxref_id = shift;
+
+  return $self->dbxref_data()->{by_dbxref_id}->{$dbxref_id};
+}
+
+sub get_dbxref_by_termid
+{
+  my $self = shift;
+  my $termid = shift;
+
+  return $self->dbxref_data()->{by_termid}->{$termid};
 }
 
 sub _build_dbxref_data
 {
   my $self = shift;
 
-  my $dbs_by_db_id = $self->get_dbs_by_db_id();
+  my $dbh = $self->dbh();
 
-  my ($dbxrefs_by_dbxref_id, $dbxrefs_by_termid) =
-    $self->_get_dbxrefs($dbs_by_db_id);
-  $self->dbxrefs_by_dbxref_id($dbxrefs_by_dbxref_id);
-  $self->dbxrefs_by_termid($dbxrefs_by_termid);
+  my $db_data = $self->db_data();
+
+  my %by_id = ();
+  my %by_termid = ();
+
+  my $proc = sub {
+    my $fields_ref = shift;
+    my @fields = @$fields_ref;
+    my ($dbxref_id, $db_id, $accession, $version) = @fields;
+    $by_id{$dbxref_id} = \@fields;
+    my $db_name = $db_data->{by_id}->{$db_id}->{name};
+    if (!defined $db_name) {
+      die "no db name for db $db_id";
+    }
+    my $termid = "$db_name:$accession";
+    push @fields, $termid;
+    $by_termid{$termid} = \@fields;
+  };
+
+  $self->_get_by_copy('dbxref', \@dbxref_column_names, $proc);
 
   return {
-    dbxrefs_by_dbxref_id => $dbxrefs_by_dbxref_id,
-    dbxrefs_by_termid => $dbxrefs_by_termid,
+    by_dbxref_id => \%by_id,
+    by_termid => \%by_termid,
   };
 }
 
@@ -339,6 +336,14 @@ sub _build_cvtermsynonyms_by_cvterm_id
   my $self = shift;
 
   return $self->_get_cvtermsynonyms();
+}
+
+sub get_cvtermsynonyms_by_cvterm_id
+{
+  my $self = shift;
+  my $cvterm_id = shift;
+
+  return $self->cvtermsynonyms_by_cvterm_id()->{$cvterm_id};
 }
 
 1;
