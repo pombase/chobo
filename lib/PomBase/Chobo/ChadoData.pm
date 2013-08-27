@@ -101,15 +101,24 @@ sub _build_cv_data
 sub get_cv_by_id
 {
   my $self = shift;
+  my $cv_id = shift;
 
-  return $self->cv_data()->{by_id};
+  return $self->cv_data()->{by_id}->{$cv_id};
 }
 
 sub get_cv_by_name
 {
   my $self = shift;
+  my $cv_name = shift;
 
-  return $self->cv_data()->{by_name};
+  return $self->cv_data()->{by_name}->{$cv_name};
+}
+
+sub get_cv_names
+{
+  my $self = shift;
+
+  return keys %{$self->cv_data()->{by_name}};
 }
 
 sub _build_db_data
@@ -117,22 +126,30 @@ sub _build_db_data
   my $self = shift;
 
   my ($dbs_by_db_id, $dbs_by_db_name) = $self->_get_cv_or_db('db');
-  return { by_id => $self->dbs_by_db_id($dbs_by_db_id),
-           by_name => $self->dbs_by_db_name($dbs_by_db_name) };
+  return { by_id => $dbs_by_db_id, by_name => $dbs_by_db_name, };
 }
 
 sub get_db_by_id
 {
   my $self = shift;
+  my $db_id = shift;
 
-  return $self->db_data()->{by_id};
+  return $self->db_data()->{by_id}->{$db_id};
 }
 
 sub get_db_by_name
 {
   my $self = shift;
+  my $db_name = shift;
 
-  return $self->db_data()->{by_name};
+  return $self->db_data()->{by_name}->{$db_name};
+}
+
+sub get_db_names
+{
+  my $self = shift;
+
+  return keys %{$self->db_data()->{by_name}};
 }
 
 sub _get_by_copy
