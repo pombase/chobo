@@ -227,10 +227,21 @@ sub _build_cvterm_data
   my $dbxref_by_termid = $self->dbxref_data()->{by_termid};
 
   my %by_termid = map {
-    my $dbxref_id = $dbxref_by_termid->{$_}->[0];
+    my $termid = $_;
+    my $dbxref_id = $dbxref_by_termid->{$termid}->[0];
     my $cvterm_data = $by_dbxref_id{$dbxref_id};
+
     if (defined $cvterm_data) {
-      ($_, $cvterm_data);
+      my $cvterm_data = bless {
+        id => $termid,
+        cvterm_id => $cvterm_data->[0],
+        name => $cvterm_data->[1],
+        cv_id => $cvterm_data->[2],
+        dbxref_id => $cvterm_data->[3],
+        is_obsolete => $cvterm_data->[4],
+        is_relationshiptype => $cvterm_data->[5],
+      }, 'PomBase::Chobo::OntologyTerm';
+      ($termid, $cvterm_data);
     } else {
       ();
     }
