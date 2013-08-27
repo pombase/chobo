@@ -39,21 +39,16 @@ use Mouse;
 
 has dbh => (is => 'ro');
 
-has cvs_by_cv_id => (is => 'rw', init_arg => undef);
-has cvs_by_cv_name => (is => 'rw', init_arg => undef);
+has cv_data => (is => 'ro', init_arg => undef, lazy_build => 1);
+has db_data => (is => 'ro', init_arg => undef, lazy_build => 1);
 
-has dbs_by_db_id => (is => 'rw', init_arg => undef);
-has dbs_by_db_name => (is => 'rw', init_arg => undef);
+has cvterm_data => (is => 'ro', init_arg => undef, lazy_build => 1);
+has dbxref_data => (is => 'ro', init_arg => undef, lazy_build => 1);
 
-has cvterms_by_cvterm_id => (is => 'rw', init_arg => undef);
-has cvterms_by_cv_id => (is => 'rw', init_arg => undef);
-has cvterms_by_dbxref_id => (is => 'rw', init_arg => undef);
-has cvterms_by_termid => (is => 'rw', init_arg => undef);
+has cvtermsynonyms_by_cvterm_id => (is => 'rw', init_arg => undef, lazy_build => 1);
 
-has cvtermsynonyms_by_cvterm_id => (is => 'rw', init_arg => undef);
-
-has dbxrefs_by_dbxref_id => (is => 'rw', init_arg => undef);
-has dbxrefs_by_termid => (is => 'rw', init_arg => undef);
+our @cvterm_column_names = qw(cvterm_id name cv_id dbxref_id is_obsolete is_relationshiptype);
+our @dbxref_column_names = qw(dbxref_id db_id accession version);
 
 sub _execute
 {
@@ -76,7 +71,7 @@ sub _execute
   $sth->finish();
 }
 
-sub _get_cv_db
+sub _get_cv_or_db
 {
   my $self = shift;
   my $table_name = shift;
@@ -95,18 +90,49 @@ sub _get_cv_db
   return \%by_id, \%by_name;
 }
 
-sub _get_cvs
+sub _build_cv_data
 {
   my $self = shift;
 
-  return $self->_get_cv_db('cv');
+  my ($cvs_by_cv_id, $cvs_by_cv_name) = $self->_get_cv_or_db('cv');
+  return { by_id => $cvs_by_cv_id, by_name => $cvs_by_cv_name };
 }
 
-sub _get_dbs
+sub get_cv_by_id
 {
   my $self = shift;
 
-  return $self->_get_cv_db('db');
+  return $self->cv_data()->{by_id};
+}
+
+sub get_cv_by_name
+{
+  my $self = shift;
+
+  return $self->cv_data()->{by_name};
+}
+
+sub _build_db_data
+{
+  my $self = shift;
+
+  my ($dbs_by_db_id, $dbs_by_db_name) = $self->_get_cv_or_db('db');
+  return { by_id => $self->dbs_by_db_id($dbs_by_db_id),
+           by_name => $self->dbs_by_db_name($dbs_by_db_name) };
+}
+
+sub get_db_by_id
+{
+  my $self = shift;
+
+  return $self->db_data()->{by_id};
+}
+
+sub get_db_by_name
+{
+  my $self = shift;
+
+  return $self->db_data()->{by_name};
 }
 
 sub _get_by_copy
@@ -146,8 +172,6 @@ sub _get_cvterms
 {
   my $self = shift;
 
-  my @column_names = qw(cvterm_id name cv_id dbxref_id is_obsolete is_relationshiptype);
-
   my %by_id = ();
   my %by_cv_id = ();
   my %by_dbxref_id = ();
@@ -162,7 +186,7 @@ sub _get_cvterms
     $by_dbxref_id{$dbxref_id} = \@fields;
   };
 
-  $self->_get_by_copy('cvterm', \@column_names, $proc);
+  $self->_get_by_copy('cvterm', \@cvterm_column_names, $proc);
 
   return \%by_id, \%by_cv_id, \%by_dbxref_id;
 }
@@ -175,8 +199,6 @@ sub _get_dbxrefs
   my %db_id_names = map { ($_, $dbs_by_id->{$_}->{name}) } keys %$dbs_by_id;
 
   my $dbh = $self->dbh();
-
-  my @column_names = qw(dbxref_id db_id accession version);
 
   my %by_id = ();
   my %by_termid = ();
@@ -195,7 +217,7 @@ sub _get_dbxrefs
     $by_termid{$termid} = \@fields;
   };
 
-  $self->_get_by_copy('dbxref', \@column_names, $proc);
+  $self->_get_by_copy('dbxref', \@dbxref_column_names, $proc);
 
   return \%by_id, \%by_termid;
 }
@@ -222,33 +244,16 @@ sub _get_cvtermsynonyms
   return \%by_cvterm_id
 }
 
-sub BUILD
+sub _build_cvterm_data
 {
   my $self = shift;
 
-  my ($cvs_by_cv_id, $cvs_by_cv_name) = $self->_get_cvs();
-  $self->cvs_by_cv_id($cvs_by_cv_id);
-  $self->cvs_by_cv_name($cvs_by_cv_name);
+warn "_build_cvterm_data()\n";
 
-  my ($dbs_by_db_id, $dbs_by_db_name) = $self->_get_dbs();
-  $self->dbs_by_db_id($dbs_by_db_id);
-  $self->dbs_by_db_name($dbs_by_db_name);
+  my $dbxrefs_by_termid = $self->get_dbxrefs_by_termid();
 
   my ($cvterms_by_cvterm_id, $cvterms_by_cv_id, $cvterms_by_dbxref_id) =
     $self->_get_cvterms();
-  $self->cvterms_by_cvterm_id($cvterms_by_cvterm_id);
-  $self->cvterms_by_cv_id($cvterms_by_cv_id);
-  $self->cvterms_by_dbxref_id($cvterms_by_dbxref_id);
-
-  my ($cvtermsynonyms_by_cvterm_id) =
-    $self->_get_cvtermsynonyms();
-  $self->cvtermsynonyms_by_cvterm_id($cvtermsynonyms_by_cvterm_id);
-
-  my ($dbxrefs_by_dbxref_id, $dbxrefs_by_termid) =
-    $self->_get_dbxrefs($dbs_by_db_id);
-  $self->dbxrefs_by_dbxref_id($dbxrefs_by_dbxref_id);
-  $self->dbxrefs_by_termid($dbxrefs_by_termid);
-
   my %cvterms_by_termid = map {
     my $dbxref_id = $dbxrefs_by_termid->{$_}->[0];
     my $cvterm_data = $cvterms_by_dbxref_id->{$dbxref_id};
@@ -259,7 +264,64 @@ sub BUILD
     }
   } keys %$dbxrefs_by_termid;
 
-  $self->cvterms_by_termid(\%cvterms_by_termid);
+  return {
+    by_cvterm_id => $cvterms_by_cvterm_id,
+    by_cv_id => $cvterms_by_cv_id,
+    by_dbxref_id => $cvterms_by_dbxref_id,
+    by_termid => \%cvterms_by_termid,
+  };
+}
+
+sub cvterms_by_cvterm_id
+{
+  my $self = shift;
+
+  return $self->cvterm_data()->{by_cvterm_id};
+}
+
+sub cvterms_by_cv_id
+{
+  my $self = shift;
+
+  return $self->cvterm_data()->{by_cv_id};
+}
+
+sub cvterms_by_dbxref_id
+{
+  my $self = shift;
+
+  return $self->cvterm_data()->{by_dbxref_id};
+}
+
+sub cvterms_by_termid
+{
+  my $self = shift;
+
+  return $self->cvterm_data()->{by_termid};
+}
+
+sub _build_dbxref_data
+{
+  my $self = shift;
+
+  my $dbs_by_db_id = $self->get_dbs_by_db_id();
+
+  my ($dbxrefs_by_dbxref_id, $dbxrefs_by_termid) =
+    $self->_get_dbxrefs($dbs_by_db_id);
+  $self->dbxrefs_by_dbxref_id($dbxrefs_by_dbxref_id);
+  $self->dbxrefs_by_termid($dbxrefs_by_termid);
+
+  return {
+    dbxrefs_by_dbxref_id => $dbxrefs_by_dbxref_id,
+    dbxrefs_by_termid => $dbxrefs_by_termid,
+  };
+}
+
+sub _build_cvtermsynonyms_by_cvterm_id
+{
+  my $self = shift;
+
+  return $self->_get_cvtermsynonyms();
 }
 
 1;
