@@ -49,12 +49,16 @@ has metadata => (is => 'ro', isa => 'HashRef');
 has terms_by_id => (is => 'rw', init_arg => undef, isa => 'HashRef');
 has terms_by_name => (is => 'rw', init_arg => undef, isa => 'HashRef');
 
+has terms_by_cv_name => (is => 'rw', init_arg => undef, isa => 'HashRef');
+
 sub BUILD
 {
   my $self = shift;
 
   my %terms_by_id = ();
   my %terms_by_name = ();
+
+  my %terms_by_cv_name = ();
 
   my $proc = sub {
     my $term = shift;
@@ -63,12 +67,19 @@ sub BUILD
 
     $terms_by_id{$term->{id}} = $term;
     $terms_by_name{$term->{name}} = $term;
+
+    if (defined $term->{namespace}) {
+      $terms_by_cv_name{$term->{namespace}}->{$term->{id}} = $term;
+    } else {
+      die "term ", $term->{id}, " has no namespace or default-namespace\n";
+    }
   };
 
   map { $proc->($_); } @{$self->terms()};
 
   $self->terms_by_id(\%terms_by_id);
   $self->terms_by_name(\%terms_by_name);
+  $self->terms_by_cv_name(\%terms_by_cv_name);
 }
 
 sub term_by_name
@@ -85,6 +96,21 @@ sub term_by_id
   my $id = shift;
 
   return $self->terms_by_id()->{$id};
+}
+
+sub get_cv_names
+{
+  my $self = shift;
+
+  return keys %{$self->terms_by_cv_name()};
+}
+
+sub get_terms_by_cv_name
+{
+  my $self = shift;
+  my $cv_name = shift;
+
+  return values %{$self->terms_by_cv_name()->{$cv_name}};
 }
 
 1;
