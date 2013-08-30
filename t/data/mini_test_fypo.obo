@@ -85,6 +85,7 @@ id: FYPO:0000114
 name: cellular process phenotype
 namespace: fission_yeast_phenotype
 alt_id: FYPO:0000028
+alt_id: FYPO:00999999
 def: "A phenotype that affects a cellular process." [PomBase:mah]
 synonym: "chromosome condensation defects" EXACT []
 is_a: FYPO:0000002 ! cell phenotype
@@ -150,6 +151,11 @@ intersection_of: FYPO:0000002 ! cell phenotype
 intersection_of: inheres_in GO:0044237
 created_by: mah79
 creation_date: 2011-04-12T02:23:26Z
+
+[Term]
+id: EXT:0000001
+name: external term for testing
+namespace: external_cv
 
 [Typedef]
 id: inheres_in

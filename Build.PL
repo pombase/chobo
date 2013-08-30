@@ -16,6 +16,7 @@ my $builder = Module::Build->new(
         'Text::CSV_XS' => 0,
         'DBI' => 0,
         'DBD::Pg' => 0,
+        'Clone' => 0,
         'Try::Tiny' => 0,
         'Mouse' => 0,
     },

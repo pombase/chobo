@@ -40,46 +40,69 @@ under the same terms as Perl itself.
 
 use Mouse;
 
+use Clone qw(clone);
+
 use PomBase::Chobo::OntologyTerm;
 
-has terms => (is => 'ro', isa => 'ArrayRef');
-has relations => (is => 'ro', isa => 'ArrayRef');
-has metadata => (is => 'ro', isa => 'HashRef');
 
-has terms_by_id => (is => 'rw', init_arg => undef, isa => 'HashRef');
-has terms_by_name => (is => 'rw', init_arg => undef, isa => 'HashRef');
+has terms_by_id => (is => 'rw', init_arg => undef, isa => 'HashRef',
+                    default => sub { {} });
+has terms_by_name => (is => 'rw', init_arg => undef, isa => 'HashRef',
+                      default => sub { {} });
+has terms_by_cv_name => (is => 'rw', init_arg => undef, isa => 'HashRef',
+                         default => sub { {} });
+has metadata_by_namespace => (is => 'rw', init_arg => undef, isa => 'HashRef',
+                              default => sub { {} });
 
-has terms_by_cv_name => (is => 'rw', init_arg => undef, isa => 'HashRef');
-
-sub BUILD
+sub add
 {
   my $self = shift;
 
-  my %terms_by_id = ();
-  my %terms_by_name = ();
+  my %args = @_;
 
-  my %terms_by_cv_name = ();
+  my $metadata = $args{metadata};
+  my $terms = $args{terms};
+
+  my $terms_by_id = $self->terms_by_id();
+  my $terms_by_name = $self->terms_by_name();
+  my $terms_by_cv_name = $self->terms_by_cv_name();
+
+  my $metadata_by_namespace = $self->metadata_by_namespace();
 
   my $proc = sub {
     my $term = shift;
 
     bless $term, 'PomBase::Chobo::OntologyTerm';
 
-    $terms_by_id{$term->{id}} = $term;
-    $terms_by_name{$term->{name}} = $term;
+    my $id = $term->{id};
+    my $name = $term->{name};
+
+    $terms_by_id->{$id} = $term;
+    $terms_by_name->{$name} = $term;
+
+    my $term_namespace = $term->namespace();
+
+    if (!exists $metadata_by_namespace->{$term_namespace}) {
+      $metadata_by_namespace->{$term_namespace} = clone $metadata;
+    }
+
+    for my $alt_id (@{$term->{alt_id}}) {
+      my $existing_term = $terms_by_id->{$alt_id};
+      if (defined $existing_term) {
+        die qq("$id" is the ID of:\n\n) . $term->to_string() .
+          "\n\nand an alt_id of:\n" . $existing_term->to_string() .
+          "\n";
+      }
+    }
 
     if (defined $term->{namespace}) {
-      $terms_by_cv_name{$term->{namespace}}->{$term->{id}} = $term;
+      $terms_by_cv_name->{$term->{namespace}}->{$term->{id}} = $term;
     } else {
       die "term ", $term->{id}, " has no namespace or default-namespace\n";
     }
   };
 
-  map { $proc->($_); } @{$self->terms()};
-
-  $self->terms_by_id(\%terms_by_id);
-  $self->terms_by_name(\%terms_by_name);
-  $self->terms_by_cv_name(\%terms_by_cv_name);
+  map { $proc->($_); } @{$terms};
 }
 
 sub term_by_name
@@ -111,6 +134,28 @@ sub get_terms_by_cv_name
   my $cv_name = shift;
 
   return values %{$self->terms_by_cv_name()->{$cv_name}};
+}
+
+sub get_terms
+{
+  my $self = shift;
+
+  return values %{$self->terms_by_id()};
+}
+
+sub get_namespaces
+{
+  my $self = shift;
+
+  return keys %{$self->metadata_by_namespace()};
+}
+
+sub get_metadata_by_namespace
+{
+  my $self = shift;
+  my $namespace = shift;
+
+  return $self->metadata_by_namespace()->{$namespace};
 }
 
 1;

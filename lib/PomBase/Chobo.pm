@@ -51,39 +51,31 @@ has dbh => (is => 'ro');
 has new_terms => (is => 'rw', init_arg => undef);
 has new_synonyms => (is => 'rw', init_arg => undef);
 has remove_synonyms => (is => 'rw', init_arg => undef);
+has chado_data => (is => 'ro', init_arg => undef, lazy_build => 1);
+
+sub _build_chado_data
+{
+  my $self = shift;
+
+  return PomBase::Chobo::ChadoData->new(dbh => $self->dbh());
+}
 
 sub process
 {
   my $self = shift;
   my %args = @_;
 
-  my $filename = $args{filename};
+  my $filenames = $args{filenames};
   my $parser = PomBase::Chobo::ParseOBO->new();
-  my $res = $parser->parse(filename => $filename);
 
-  my $chado_data = PomBase::Chobo::ChadoData->new(dbh => $self->dbh());
+  my $combined = PomBase::Chobo::OntologyData->new();
 
-  my $terms_table = 'chobo_terms';
-
-  my $dbh = $self->dbh();
-
-  $dbh->do("CREATE TEMPORARY TABLE $terms_table (local_id integer PRIMARY KEY, cvterm_id integer, name text, db_name text, accession text, dbxref_id integer)")
-    or die "can't create temporary table $terms_table";
-  $dbh->do("COPY $terms_table FROM STDIN");
-
-  my $local_id = 0;
-
-  for my $term (@{$res->{terms}}) {
-    my ($db_name, $accession) = $term->{id} =~ /(.*?):(.*)/;
-
-    my $term_name = $term->{name};
-
-    $dbh->pg_putcopydata("$local_id\t0\t$term_name\t$db_name\t$accession\t0\n");
-
-    $local_id++;
+  for my $filename (@$filenames) {
+    my $ontology_data = $parser->parse(filename => $filename);
+    $chobo->process(filename => $filename);
   }
 
-  $dbh->pg_putcopyend();
+  $self->chado_store($self->chado_data(), $ontology_data);
 }
 
 1;

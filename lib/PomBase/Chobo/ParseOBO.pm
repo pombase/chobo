@@ -43,59 +43,6 @@ use PomBase::Chobo::OntologyData;
 
 has terms => (is => 'rw', init_arg => undef);
 
-my %field_conf = (
-  id => {
-    type => 'SINGLE',
-  },
-  name => {
-    type => 'SINGLE',
-  },
-  namespace => {
-    type => 'SINGLE',
-  },
-  alt_id => {
-    type => 'ARRAY',
-  },
-  is_a => {
-    type => 'ARRAY',
-  },
-  xref => {
-    type => 'ARRAY',
-  },
-  synonym => {
-    type => 'ARRAY',
-    process => sub {
-      my $val = shift;
-      if ($val =~ /"(.+)"\s*(.*)/) {
-        my $synonym = $1;
-        my $rest = $2;
-        my %ret = (
-          synonym => $synonym,
-        );
-
-        $rest =~ s/^\s+//;
-
-        if ($rest =~ /(\S+)\s+(?:(?:(\S+)\s+)?(?:\s+\[(.*)\]))?/) {
-          my ($scope, $type, $dbxrefs) = ($1, $2, $3);
-
-          $ret{scope} = $scope;
-          $ret{type} = $type;
-
-          my @dbxrefs = ();
-          if (defined $dbxrefs) {
-            @dbxrefs = split /\s*,\s*/, $dbxrefs;
-          }
-          $ret{dbxrefs} = \@dbxrefs;
-        }
-
-        return \%ret;
-      } else {
-        warn "unknown synonym format: $val\n";
-        return undef;
-      }
-    },
-  },
-);
 
 sub _save_stanza_line
 {
@@ -106,7 +53,7 @@ sub _save_stanza_line
     my $field_name = $1;
     my $field_value = $2;
 
-    my $field_conf = $field_conf{$field_name};
+    my $field_conf = $PomBase::Chobo::OntologyConf::field_conf{$field_name};
 
     if (defined $field_conf) {
       if (defined $field_conf->{process}) {
@@ -115,7 +62,7 @@ sub _save_stanza_line
       if (defined $field_conf->{type} && $field_conf->{type} eq 'SINGLE') {
         $stanza->{$field_name} = $field_value;
       } else {
-        push @{$stanza->{$field_name . '_list'}}, $field_value;
+        push @{$stanza->{$field_name}}, $field_value;
       }
     }
   }
@@ -135,7 +82,6 @@ sub _finish_stanza
 {
   my $current = shift;
   my $terms_ref = shift;
-  my $relations_ref = shift;
   my $metadata_ref = shift;
 
   if (!defined $current->{id}) {
@@ -151,11 +97,7 @@ sub _finish_stanza
     $current->{namespace} = $metadata_ref->{'default-namespace'};
   }
 
-  if ($current->{is_relationshiptype}) {
-    push @$relations_ref, $current;
-  } else {
-    push @$terms_ref, $current;
-  }
+  push @$terms_ref, $current;
 }
 
 sub fatal
@@ -177,10 +119,17 @@ sub parse
   my %args = @_;
 
   my $filename = $args{filename};
+  if (!defined $filename) {
+    die 'no filename passed to add()';
+  }
+
+  my $ontology_data = $args{ontology_data};
+  if (!defined $ontology_data) {
+    die 'no ontology_data passed to add()';
+  }
 
   my %metadata = ();
   my @terms = ();
-  my @relations = ();
 
   my $current = undef;
   my @synonyms = ();
@@ -198,7 +147,7 @@ sub parse
       my $stanza_type = $1;
 
       if (defined $current) {
-        _finish_stanza($current, \@terms, \@relations, \%metadata);
+        _finish_stanza($current, \@terms, \%metadata);
       }
 
       my $is_relationshiptype = 0;
@@ -234,16 +183,16 @@ sub parse
   }
 
   if (defined $current) {
-    _finish_stanza($current, \@terms, \@relations, \%metadata);
+    _finish_stanza($current, \@terms, \%metadata);
   }
 
   close $fh or die "can't close $filename: $!";
 
   $self->terms(\@terms);
 
-  return PomBase::Chobo::OntologyData->new(metadata => \%metadata,
-                                           terms => \@terms,
-                                           relations => \@relations);
+  $ontology_data->add(metadata => \%metadata,
+                      terms => \@terms);
+
 }
 
 1;
