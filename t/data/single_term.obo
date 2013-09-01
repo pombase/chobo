@@ -1,0 +1,14 @@
+format-version: 1.2
+date: 12:04:2011 18:01
+saved-by: mah79
+auto-generated-by: OBO-Edit 2.1-beta12
+default-namespace: file:/Users/mah79/pombase/phenotype_ontology/fypo.obo
+remark: svn version: $Revision: 136 $
+ontology: fypo
+
+[Term]
+id: FYPO:0000001
+name: phenotype
+namespace: fission_yeast_phenotype
+def: "Any of the set of observable characteristics of an organism resulting from the interaction of its genotype with the environment." [PomBase:mah]
+creation_date: 2011-03-16T03:59:25Z

@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 11;
+use Test::More tests => 12;
 use Test::Deep;
 
 use PomBase::Chobo::ParseOBO;
@@ -44,3 +44,13 @@ is (@fypo_relationships, 3);
 
 my @fypo_non_relationships = grep { !$_->is_relationshiptype(); } @fypo_cvterms;
 is (@fypo_non_relationships, 13);
+
+
+my $single_term_ontology_data = PomBase::Chobo::OntologyData->new();
+
+$parser->parse(filename => 't/data/single_term.obo',
+               ontology_data => $single_term_ontology_data);
+$parser->parse(filename => 't/data/single_term.obo',
+               ontology_data => $single_term_ontology_data);
+
+is ($single_term_ontology_data->get_terms(), 1);

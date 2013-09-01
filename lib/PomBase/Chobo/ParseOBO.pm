@@ -37,7 +37,9 @@ under the same terms as Perl itself.
 =cut
 
 use Mouse;
+use Try::Tiny;
 use FileHandle;
+use String::Strip;
 
 use PomBase::Chobo::OntologyData;
 
@@ -68,33 +70,33 @@ sub _save_stanza_line
   }
 }
 
-sub _clean_line
+sub die_line
 {
-  my $line_ref = shift;
+  my $filename = shift;
+  my $linenum = shift;
+  my $message = shift;
 
-  chomp $$line_ref;
-  $$line_ref =~ s/!.*//;
-  $$line_ref =~ s/^\s+//;
-  $$line_ref =~ s/\s+$//;
+  die "$filename:$linenum:$message\n";
 }
 
 sub _finish_stanza
 {
+  my $filename = shift;
   my $current = shift;
   my $terms_ref = shift;
   my $metadata_ref = shift;
 
   if (!defined $current->{id}) {
-    warn "stanza at line ", $current->{line}, " has no id: - skipped\n";
-    return;
-  }
-  if (!defined $current->{name}) {
-    warn "stanza at line ", $current->{line}, " has no name: - skipped\n";
+    die_line $filename,  $current->{line}, "stanza has no id\n";
     return;
   }
 
   if (!defined $current->{namespace}) {
-    $current->{namespace} = $metadata_ref->{'default-namespace'};
+    $current->{namespace} =
+      $metadata_ref->{'default-namespace'};
+
+    # the namespace may be undef, temporary - hopefully it will merge with a
+    # term/stanza that has a namespace before we use it
   }
 
   push @$terms_ref, $current;
@@ -120,12 +122,12 @@ sub parse
 
   my $filename = $args{filename};
   if (!defined $filename) {
-    die 'no filename passed to add()';
+    die 'no filename passed to parse()';
   }
 
   my $ontology_data = $args{ontology_data};
   if (!defined $ontology_data) {
-    die 'no ontology_data passed to add()';
+    die 'no ontology_data passed to parse()';
   }
 
   my %metadata = ();
@@ -139,7 +141,9 @@ sub parse
   my $fh = FileHandle->new($filename, 'r') or die "can't open $filename: $!";
 
   while (defined (my $line = <$fh>)) {
-    _clean_line(\$line);
+    chomp $line;
+    $line =~ s/!.*//;
+    StripLTSpace($line);
 
     next if length $line == 0;
 
@@ -147,7 +151,7 @@ sub parse
       my $stanza_type = $1;
 
       if (defined $current) {
-        _finish_stanza($current, \@terms, \%metadata);
+        _finish_stanza($filename, $current, \@terms, \%metadata);
       }
 
       my $is_relationshiptype = 0;
@@ -183,16 +187,19 @@ sub parse
   }
 
   if (defined $current) {
-    _finish_stanza($current, \@terms, \%metadata);
+    _finish_stanza($filename, $current, \@terms, \%metadata);
   }
 
   close $fh or die "can't close $filename: $!";
 
   $self->terms(\@terms);
 
-  $ontology_data->add(metadata => \%metadata,
-                      terms => \@terms);
-
+  try {
+    $ontology_data->add(metadata => \%metadata,
+                        terms => \@terms);
+  } catch {
+    die "$filename: $_\n";
+  }
 }
 
 1;

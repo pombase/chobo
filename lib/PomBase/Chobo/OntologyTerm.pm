@@ -39,9 +39,14 @@ use Mouse;
 
 use PomBase::Chobo::OntologyConf;
 
+use Clone qw(clone);
+use Data::Compare;
+use List::Compare;
+
 has id => (is => 'ro', isa => 'Str');
 has name => (is => 'ro', isa => 'Str');
 has namespace => (is => 'ro', isa => 'Str');
+has alt_id => (is => 'ro', isa => 'ArrayRef');
 has is_relationshiptype => (is => 'ro', isa => 'Bool');
 
 our @field_names;
@@ -60,7 +65,77 @@ sub bless_object
 {
   my $object = shift;
 
+  $object->{alt_id} //= [];
+
   bless $object, __PACKAGE__;
+}
+
+sub merge
+{
+  my $self = shift;
+  my $new_term = shift;
+
+  return if $self == $new_term;
+
+  my $lc = List::Compare->new([$self->id(), @{$self->alt_id()}],
+                              [$new_term->id(), @{$new_term->alt_id()}]);
+
+  if (scalar($lc->get_intersection()) == 0) {
+    return undef;
+  }
+
+  my @new_alt_id = List::Compare->new([$lc->get_union()], [$self->id()])->get_unique(1);
+
+  $self->{alt_id} = \@new_alt_id;
+
+  if (defined $self->name()) {
+    if (defined $new_term->name()) {
+      if ($new_term->name() ne $self->name()) {
+        die qq(term merging failed: IDs match but "name" tag of:\n\n) .
+          $new_term->to_string() .
+          "\n\ndiffers from name in previous stanza:\n" . $self->to_string() . "\n";
+      }
+    } else {
+      # use existing name
+    }
+  } else {
+    $self->{name} = $new_term->name();
+  }
+
+  my $merge_field = sub {
+    my $name = shift;
+    my $new_value = shift;
+
+    if (ref $new_value) {
+      for my $single_value (@$new_value) {
+        if (!grep { Compare($_, $single_value) } @{$self->{$name}}) {
+          push @{$self->{$name}}, clone $single_value;
+        }
+      }
+    } else {
+      if (defined $self->{$name}) {
+        if ($self->{$name} ne $new_value) {
+        die qq("$name" tag of:\n\n) . $new_term->to_string() .
+          "\n\ndiffers from $name of:\n" . $self->to_string() . "\n";
+        }
+      } else {
+        $self->{$name} = $new_value;
+      }
+    }
+  };
+
+  for my $field_name (@field_names) {
+    next if $field_name eq 'id' or $field_name eq 'name' or
+      $field_name eq 'alt_id';
+
+    my $new_field_value = $new_term->{$field_name};
+
+    if (defined $new_field_value) {
+      $merge_field->($field_name, $new_field_value);
+    }
+  }
+
+  return $self;
 }
 
 sub to_string
@@ -100,7 +175,7 @@ sub to_string
   };
 
   for my $field_name (@field_names) {
-  my $field_value = $self->{$field_name};
+    my $field_value = $self->{$field_name};
 
     if (defined $field_value) {
       push @lines, $line_maker->($field_name, $field_value);

@@ -70,35 +70,61 @@ sub add
   my $metadata_by_namespace = $self->metadata_by_namespace();
 
   my $proc = sub {
-    my $term = shift;
+    my $new_term = shift;
 
-    bless $term, 'PomBase::Chobo::OntologyTerm';
+    my @new_term_ids = ($new_term->{id});
 
-    my $id = $term->{id};
-    my $name = $term->{name};
-
-    $terms_by_id->{$id} = $term;
-    $terms_by_name->{$name} = $term;
-
-    my $term_namespace = $term->namespace();
-
-    if (!exists $metadata_by_namespace->{$term_namespace}) {
-      $metadata_by_namespace->{$term_namespace} = clone $metadata;
+    if (defined $new_term->{alt_id}) {
+      push @new_term_ids, @{$new_term->{alt_id}};
     }
 
-    for my $alt_id (@{$term->{alt_id}}) {
-      my $existing_term = $terms_by_id->{$alt_id};
+    my @found_existing_terms = ();
+
+    for my $id (@new_term_ids) {
+      my $existing_term = $terms_by_id->{$id};
+
       if (defined $existing_term) {
-        die qq("$id" is the ID of:\n\n) . $term->to_string() .
-          "\n\nand an alt_id of:\n" . $existing_term->to_string() .
-          "\n";
+        if (grep { $_ == $existing_term } @found_existing_terms) {
+          push @found_existing_terms, $existing_term;
+        }
       }
     }
 
-    if (defined $term->{namespace}) {
-      $terms_by_cv_name->{$term->{namespace}}->{$term->{id}} = $term;
+    my $term = $new_term;
+
+    if (@found_existing_terms > 1) {
+      die "two terms match an alt_id field from:\n" .
+        $term->to_string() . "\n\nmatching term 1:\n" .
+        $found_existing_terms[0]->to_string() . "\n\nmatching term 2:\n" .
+        $found_existing_terms[1]->to_string() . "\n";
     } else {
-      die "term ", $term->{id}, " has no namespace or default-namespace\n";
+      if (@found_existing_terms == 1) {
+        my $existing_term = $found_existing_terms[0];
+        $existing_term->merge($term);
+        $term = $existing_term;
+      } else {
+        PomBase::Chobo::OntologyTerm::bless_object($term);
+      }
+    }
+
+    for my $id (@new_term_ids) {
+      $terms_by_id->{$id} = $term;
+    }
+
+    my $name = $term->{name};
+
+    if (defined $name) {
+      $terms_by_name->{$name} = $term;
+    }
+
+    my $term_namespace = $term->namespace();
+
+    if (defined $term_namespace) {
+      $terms_by_cv_name->{$term->{namespace}}->{$term->{id}} = $term;
+
+      if (!exists $metadata_by_namespace->{$term_namespace}) {
+        $metadata_by_namespace->{$term_namespace} = clone $metadata;
+      }
     }
   };
 
@@ -140,7 +166,7 @@ sub get_terms
 {
   my $self = shift;
 
-  return values %{$self->terms_by_id()};
+  return map { $self->get_terms_by_cv_name($_); } $self->get_cv_names();
 }
 
 sub get_namespaces
