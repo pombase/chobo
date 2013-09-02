@@ -35,6 +35,8 @@ under the same terms as Perl itself.
 
 use warnings;
 
+use String::Strip;
+
 our %field_conf = (
   id => {
     type => 'SINGLE',
@@ -58,14 +60,12 @@ our %field_conf = (
     type => 'ARRAY',
     process => sub {
       my $val = shift;
-      if ($val =~ /"(.+)"\s*(.*)/) {
+      if ($val =~ /^"(.+)"\s*(.*)/) {
         my $synonym = $1;
         my $rest = $2;
         my %ret = (
           synonym => $synonym,
         );
-
-        $rest =~ s/^\s+//;
 
         if ($rest =~ /(\S+)\s+(?:(?:(\S+)\s+)?(?:\s+\[(.*)\]))?/) {
           my ($scope, $type, $dbxrefs) = ($1, $2, $3);
