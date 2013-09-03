@@ -32,10 +32,10 @@ my $load_terms = 1;
 my $load_closure = 0;
 
 if (@ARGV && $ARGV[0] =~ /^-/) {
-  if ($ARGV[0] eq '-p') {
+  if ($ARGV[0] eq '-c') {
     $load_closure = 1;
   } else {
-    if ($ARGV[0] eq '-P') {
+    if ($ARGV[0] eq '-C') {
       $load_closure = 1;
       $load_terms = 0;
     } else {
@@ -58,7 +58,10 @@ my $dbh = DBI->connect($connect_str, $user, $pass,
 my $chobo = PomBase::Chobo->new(dbh => $dbh);
 
 try {
-  $chobo->process(filenames => \@filenames);
+  for my $filename (@filenames) {
+    $chobo->read_obo(filename => $filename);
+  }
+  $chobo->chado_store();
   warn "commiting\n";
   $dbh->commit();
 } catch {

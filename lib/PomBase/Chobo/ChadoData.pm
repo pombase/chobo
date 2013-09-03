@@ -76,16 +76,28 @@ sub _get_cv_or_db
   my $self = shift;
   my $table_name = shift;
 
+  my $table_id_column = "${table_name}_id";
+
   my %by_id = ();
   my %by_name = ();
 
   my $proc = sub {
     my $row_ref = shift;
-    $by_id{$row_ref->{"${table_name}_id"}} = $row_ref;
-    $by_name{$row_ref->{name}} = $row_ref;
+
+    my $id = $row_ref->{$table_id_column};
+    my $name = $row_ref->{name};
+
+    my %data = (
+      $table_id_column, $id,
+      name => $name,
+    );
+
+    $by_id{$id} = \%data;
+    $by_name{$name} = \%data;
+
   };
 
-  $self->_execute("select * from $table_name", $proc);
+  $self->_execute("select $table_id_column, name from $table_name", $proc);
 
   return \%by_id, \%by_name;
 }
@@ -309,6 +321,14 @@ sub get_dbxref_by_termid
   return $self->dbxref_data()->{by_termid}->{$termid};
 }
 
+sub get_dbxrefs_by_db_id
+{
+  my $self = shift;
+  my $db_id = shift;
+
+  return $self->dbxref_data()->{by_db_name}->{$db_id};
+}
+
 sub _build_dbxref_data
 {
   my $self = shift;
@@ -317,28 +337,37 @@ sub _build_dbxref_data
 
   my $db_data = $self->db_data();
 
-  my %by_id = ();
+  my %by_dbxref_id = ();
   my %by_termid = ();
+  my %by_db_name = ();
 
   my $proc = sub {
     my $fields_ref = shift;
     my @fields = @$fields_ref;
     my ($dbxref_id, $db_id, $accession, $version) = @fields;
-    $by_id{$dbxref_id} = \@fields;
+
+    my %data = (dbxref_id => $dbxref_id,
+                db_id => $db_id,
+                accession => $accession,
+                version => $version);
+
     my $db_name = $db_data->{by_id}->{$db_id}->{name};
     if (!defined $db_name) {
       die "no db name for db $db_id";
     }
     my $termid = "$db_name:$accession";
-    push @fields, $termid;
-    $by_termid{$termid} = \@fields;
+
+    $by_dbxref_id{$dbxref_id} = \%data;
+    $by_termid{$termid} = \%data;
+    $by_db_name{$db_name}->{$termid} = \%data;
   };
 
   $self->_get_by_copy('dbxref', \@dbxref_column_names, $proc);
 
   return {
-    by_dbxref_id => \%by_id,
+    by_dbxref_id => \%by_dbxref_id,
     by_termid => \%by_termid,
+    by_db_name => \%by_db_name,
   };
 }
 

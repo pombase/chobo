@@ -45,13 +45,18 @@ use Text::CSV;
 
 use PomBase::Chobo::ParseOBO;
 use PomBase::Chobo::ChadoData;
+use PomBase::Chobo::OntologyData;
+
 
 has dbh => (is => 'ro');
-
 has new_terms => (is => 'rw', init_arg => undef);
 has new_synonyms => (is => 'rw', init_arg => undef);
 has remove_synonyms => (is => 'rw', init_arg => undef);
 has chado_data => (is => 'ro', init_arg => undef, lazy_build => 1);
+has ontology_data => (is => 'ro', init_arg => undef, lazy_build => 1);
+has parser => (is => 'ro', init_arg => undef, lazy_build => 1);
+
+with 'PomBase::Chobo::Role::ChadoStore';
 
 sub _build_chado_data
 {
@@ -60,22 +65,31 @@ sub _build_chado_data
   return PomBase::Chobo::ChadoData->new(dbh => $self->dbh());
 }
 
-sub process
+sub _build_parser
+{
+  my $self = shift;
+
+  return PomBase::Chobo::ParseOBO->new();
+}
+
+sub _build_ontology_data
+{
+  my $self = shift;
+
+  return PomBase::Chobo::OntologyData->new();
+}
+
+sub read_obo
 {
   my $self = shift;
   my %args = @_;
 
-  my $filenames = $args{filenames};
-  my $parser = PomBase::Chobo::ParseOBO->new();
+  my $filename = $args{filename};
 
-  my $combined = PomBase::Chobo::OntologyData->new();
+  my $ontology_data = $self->ontology_data();
+  my $parser = $self->parser();
 
-  for my $filename (@$filenames) {
-    my $ontology_data = $parser->parse(filename => $filename);
-    $chobo->process(filename => $filename);
-  }
-
-  $self->chado_store($self->chado_data(), $ontology_data);
+  $parser->parse(filename => $filename, ontology_data => $ontology_data);
 }
 
 1;

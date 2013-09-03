@@ -116,12 +116,15 @@ sub add
 
       my ($db_name, $accession);
 
-      unless (($db_name, $accession) = $id =~ /^(\S+):(\S+)$/) {
+      unless (($db_name, $accession) = $id =~ /^(\S+):(.+?)\s*$/) {
         $db_name = 'null';
         $accession = $id;
       }
 
-      $self->terms_by_db_name()->{$db_name}->{accession} = $term;
+      $term->{accession} = $accession;
+      $term->{db_name} = $db_name;
+
+      $self->terms_by_db_name()->{$db_name}->{$accession} = $term;
     }
 
     my $name = $term->{name};
