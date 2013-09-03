@@ -77,8 +77,8 @@ sub merge
 
   return if $self == $new_term;
 
-  my $lc = List::Compare->new([$self->id(), @{$self->alt_id()}],
-                              [$new_term->id(), @{$new_term->alt_id()}]);
+  my $lc = List::Compare->new([$self->{id}, @{$self->{alt_id}}],
+                              [$new_term->{id}, @{$new_term->{alt_id}}]);
 
   if (scalar($lc->get_intersection()) == 0) {
     return undef;
@@ -88,45 +88,37 @@ sub merge
 
   $self->{alt_id} = \@new_alt_id;
 
-  if (defined $self->name()) {
-    if (defined $new_term->name()) {
-      if ($new_term->name() ne $self->name()) {
-        die qq(term merging failed: IDs match but "name" tag of:\n\n) .
-          $new_term->to_string() .
-          "\n\ndiffers from name in previous stanza:\n" . $self->to_string() . "\n";
-      }
-    } else {
-      # use existing name
-    }
-  } else {
-    $self->{name} = $new_term->name();
-  }
-
   my $merge_field = sub {
     my $name = shift;
     my $new_value = shift;
 
-    if (ref $new_value) {
-      for my $single_value (@$new_value) {
-        if (!grep { Compare($_, $single_value) } @{$self->{$name}}) {
-          push @{$self->{$name}}, clone $single_value;
+
+    my $field_conf = $PomBase::Chobo::OntologyConf::field_conf{$name};
+
+    if (defined $field_conf) {
+      if (defined $field_conf->{type} && $field_conf->{type} eq 'SINGLE') {
+        if (defined $self->{$name}) {
+          if ($self->{$name} ne $new_value) {
+            die qq("$name" tag of:\n\n) . $new_term->to_string() .
+              "\n\ndiffers from $name of:\n" . $self->to_string() . "\n";
+          }
+        } else {
+          $self->{$name} = $new_value;
+        }
+      } else {
+        for my $single_value (@$new_value) {
+          if (!grep { Compare($_, $single_value) } @{$self->{$name}}) {
+            push @{$self->{$name}}, clone $single_value;
+          }
         }
       }
     } else {
-      if (defined $self->{$name}) {
-        if ($self->{$name} ne $new_value) {
-        die qq("$name" tag of:\n\n) . $new_term->to_string() .
-          "\n\ndiffers from $name of:\n" . $self->to_string() . "\n";
-        }
-      } else {
-        $self->{$name} = $new_value;
-      }
+      die "unhandled field in merge(): $name\n";
     }
   };
 
   for my $field_name (@field_names) {
-    next if $field_name eq 'id' or $field_name eq 'name' or
-      $field_name eq 'alt_id';
+    next if $field_name eq 'id' or $field_name eq 'alt_id';
 
     my $new_field_value = $new_term->{$field_name};
 

@@ -41,6 +41,7 @@ under the same terms as Perl itself.
 use Mouse;
 
 use Clone qw(clone);
+use Try::Tiny;
 
 use PomBase::Chobo::OntologyTerm;
 
@@ -71,6 +72,7 @@ sub add
 
   my $proc = sub {
     my $new_term = shift;
+    PomBase::Chobo::OntologyTerm::bless_object($new_term);
 
     my @new_term_ids = ($new_term->{id});
 
@@ -84,7 +86,7 @@ sub add
       my $existing_term = $terms_by_id->{$id};
 
       if (defined $existing_term) {
-        if (grep { $_ == $existing_term } @found_existing_terms) {
+        if (!grep { $_ == $existing_term } @found_existing_terms) {
           push @found_existing_terms, $existing_term;
         }
       }

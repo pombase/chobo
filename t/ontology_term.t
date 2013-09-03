@@ -70,7 +70,7 @@ try {
   $term->merge($term_different_name);
   fail("merge should have failed");
 } catch {
-  like ($_, qr/term merging failed: IDs match but "name" tag/);
+  like ($_, qr/differs from name of/);
 };
 
 
@@ -145,5 +145,6 @@ try {
   $term_name_clash_1->merge($term_name_clash_2);
   fail("merge() should fail - names don't match");
 } catch {
-  ok (/term merging failed/);
+  my $error = $_;
+  like ($error, qr/differs from name/);
 };

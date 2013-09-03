@@ -18,5 +18,5 @@ try {
   fail("this should fail because of two terms with the same ID (one id and one alt_id");
 } catch {
   my $error = $_;
-  ok ($error =~ /is the ID of:/);
+  like ($error, qr/differs from name of/);
 }
