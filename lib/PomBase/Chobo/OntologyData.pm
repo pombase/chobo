@@ -52,6 +52,8 @@ has terms_by_name => (is => 'rw', init_arg => undef, isa => 'HashRef',
                       default => sub { {} });
 has terms_by_cv_name => (is => 'rw', init_arg => undef, isa => 'HashRef',
                          default => sub { {} });
+has terms_by_db_name => (is => 'rw', init_arg => undef, isa => 'HashRef',
+                         default => sub { {} });
 has metadata_by_namespace => (is => 'rw', init_arg => undef, isa => 'HashRef',
                               default => sub { {} });
 
@@ -111,6 +113,15 @@ sub add
 
     for my $id (@new_term_ids) {
       $terms_by_id->{$id} = $term;
+
+      my ($db_name, $accession);
+
+      unless (($db_name, $accession) = $id =~ /^(\S+):(\S+)$/) {
+        $db_name = 'null';
+        $accession = $id;
+      }
+
+      $self->terms_by_db_name()->{$db_name}->{accession} = $term;
     }
 
     my $name = $term->{name};
@@ -162,6 +173,21 @@ sub get_terms_by_cv_name
   my $cv_name = shift;
 
   return values %{$self->terms_by_cv_name()->{$cv_name}};
+}
+
+sub get_db_names
+{
+  my $self = shift;
+
+  return keys %{$self->terms_by_db_name()};
+}
+
+sub get_terms_by_db_name
+{
+  my $self = shift;
+  my $db_name = shift;
+
+  return values %{$self->terms_by_db_name()->{$db_name}};
 }
 
 sub get_terms

@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 12;
+use Test::More tests => 13;
 use Test::Deep;
 
 use PomBase::Chobo::ParseOBO;
@@ -34,6 +34,10 @@ is ($ontology_data->get_metadata_by_namespace("fission_yeast_phenotype")->{ontol
 my @cv_names = sort $ontology_data->get_cv_names();
 
 cmp_deeply(\@cv_names, ['external_cv', 'fission_yeast_phenotype']);
+
+my @db_names = sort $ontology_data->get_db_names();
+
+cmp_deeply(\@db_names, ['EXT', 'FYPO', 'null']);
 
 my @fypo_cvterms = $ontology_data->get_terms_by_cv_name('fission_yeast_phenotype');
 
