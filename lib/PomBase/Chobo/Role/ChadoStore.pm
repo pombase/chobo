@@ -84,12 +84,12 @@ my %row_makers = (
       my $db_name = $_;
       my $db_id = $chado_data->get_db_by_name($db_name)->{db_id};
 
+      my %current_db_terms = %{$ontology_data->terms_by_db_name()->{$db_name}};
+
       map {
-        my $term_data = $_;
-
-        [$db_id, $term_data->{accession}];
-
-      } values %{$ontology_data->terms_by_db_name()->{$db_name}};
+        my $accession = $_;
+        [$db_id, $accession];
+     } keys %current_db_terms;
     } $ontology_data->get_db_names();
   },
 
@@ -115,7 +115,7 @@ sub chado_store
     my @rows = $row_makers{$table_to_store}->($self->ontology_data(),
                                               $self->chado_data());
 
-    $self->_copy_to_table($table_to_store, $table_column_names{$table_to_store},
+$self->_copy_to_table($table_to_store, $table_column_names{$table_to_store},
                           \@rows);
   }
 
