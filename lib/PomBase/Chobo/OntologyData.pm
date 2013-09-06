@@ -114,15 +114,8 @@ sub add
     for my $id (@new_term_ids) {
       $terms_by_id->{$id} = $term;
 
-      my ($db_name, $accession);
-
-      unless (($db_name, $accession) = $id =~ /^(\S+):(.+?)\s*$/) {
-        $db_name = 'null';
-        $accession = $id;
-      }
-
-      $term->{accession} = $accession;
-      $term->{db_name} = $db_name;
+      my $db_name = $term->{db_name};
+      my $accession = $term->{accession};
 
       $self->terms_by_db_name()->{$db_name}->{$accession} = $term;
     }

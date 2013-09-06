@@ -67,6 +67,18 @@ sub bless_object
 
   $object->{alt_id} //= [];
 
+  my ($db_name, $accession);
+
+  unless (($db_name, $accession) = $object->{id} =~ /^(\S+):(.+?)\s*$/) {
+    $db_name = $object->{namespace} // $object->{ontology} // $object->{filename};
+    $accession = $object->{id};
+
+    $object->{id} = "$db_name:$accession";
+  }
+
+  $object->{accession} = $accession;
+  $object->{db_name} = $db_name;
+
   bless $object, __PACKAGE__;
 }
 
@@ -90,23 +102,38 @@ sub merge
 
   my $merge_field = sub {
     my $name = shift;
-    my $new_value = shift;
-
+    my $new_term = shift;
 
     my $field_conf = $PomBase::Chobo::OntologyConf::field_conf{$name};
 
     if (defined $field_conf) {
       if (defined $field_conf->{type} && $field_conf->{type} eq 'SINGLE') {
-        if (defined $self->{$name}) {
-          if ($self->{$name} ne $new_value) {
-            die qq("$name" tag of:\n\n) . $new_term->to_string() .
-              "\n\ndiffers from $name of:\n" . $self->to_string() . "\n";
-          }
+        my $res = undef;
+        if (defined $field_conf->{merge}) {
+          $res = $field_conf->{merge}->($self, $new_term);
+        }
+
+        if (defined $res) {
+          $self->{$name} = $res;
         } else {
-          $self->{$name} = $new_value;
+          my $new_field_value = $new_term->{$name};
+
+          if (defined $new_term->{$name}) {
+            if (defined $self->{$name}) {
+              if ($self->{$name} ne $new_field_value) {
+                die qq("$name" tag of:\n\n) . $new_term->to_string() .
+                "\n\ndiffers from $name of:\n" . $self->to_string() . "\n";
+              }
+            } else {
+              $self->{$name} = $new_field_value;
+            }
+          } else {
+            # no merging to do
+          }
         }
       } else {
-        for my $single_value (@$new_value) {
+        my $new_field_value = $new_term->{$name};
+        for my $single_value (@$new_field_value) {
           if (!grep { Compare($_, $single_value) } @{$self->{$name}}) {
             push @{$self->{$name}}, clone $single_value;
           }
@@ -120,10 +147,8 @@ sub merge
   for my $field_name (@field_names) {
     next if $field_name eq 'id' or $field_name eq 'alt_id';
 
-    my $new_field_value = $new_term->{$field_name};
-
-    if (defined $new_field_value) {
-      $merge_field->($field_name, $new_field_value);
+    if (!Compare($self->{$field_name}, $new_term->{$field_name})) {
+      $merge_field->($field_name, $new_term);
     }
   }
 

@@ -46,6 +46,27 @@ our %field_conf = (
   },
   namespace => {
     type => 'SINGLE',
+    merge => sub {
+      my $self = shift;
+      my $other = shift;
+
+      my $self_namespace = $self->{namespace};
+      my $other_namespace = $other->{namespace};
+      if (defined $self_namespace &&
+          defined $other_namespace) {
+        # if the namespace is the same as the db_name, remove it and use the
+        # namespace from the other term to avoid a namespace clash
+        if ($self_namespace eq $self->{db_name}) {
+          $self->{namespace} = undef;
+        } else {
+          if ($other_namespace eq $other->{db_name}) {
+            $other->{namespace} = undef;
+          }
+        }
+      }
+      # do default merging
+      return undef;
+    },
   },
   alt_id => {
     type => 'ARRAY',

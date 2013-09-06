@@ -99,6 +99,11 @@ sub _finish_stanza
     # term/stanza that has a namespace before we use it
   }
 
+  $current->{filename} = $filename;
+  $current->{metadata} = $metadata_ref;
+
+  PomBase::Chobo::OntologyTerm::bless_object($current);
+
   push @$terms_ref, $current;
 }
 
