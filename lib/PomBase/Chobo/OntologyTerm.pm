@@ -118,11 +118,13 @@ sub merge
         } else {
           my $new_field_value = $new_term->{$name};
 
-          if (defined $new_term->{$name}) {
+          if (defined $new_field_value) {
             if (defined $self->{$name}) {
               if ($self->{$name} ne $new_field_value) {
-                die qq("$name" tag of:\n\n) . $new_term->to_string() .
-                "\n\ndiffers from $name of:\n" . $self->to_string() . "\n";
+                warn qq("$name" tag of this stanza differs from previously ) .
+                  qq(seen value ") . $self->{$name} .
+                  qq(" - ignoring new value:\n\n:) .
+                  $new_term->to_string() . "\n\n";
               }
             } else {
               $self->{$name} = $new_field_value;

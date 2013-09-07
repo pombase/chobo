@@ -12,11 +12,11 @@ my $ontology_data = PomBase::Chobo::OntologyData->new();
 
 $parser->parse(filename => 't/data/mini_test_fypo.obo',
                ontology_data => $ontology_data);
-try {
+use Capture::Tiny qw(capture);
+
+my ($stdout, $stderr, $exit) = capture {
   $parser->parse(filename => 't/data/bogus_alt_id_fypo.obo',
                  ontology_data => $ontology_data);
-  fail("this should fail because of two terms with the same ID (one id and one alt_id");
-} catch {
-  my $error = $_;
-  like ($error, qr/differs from name of/);
-}
+};
+
+like ($stderr, qr/name" tag of this stanza differs from previously/);

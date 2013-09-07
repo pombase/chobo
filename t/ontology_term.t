@@ -66,15 +66,15 @@ is ($term->to_string(), $expected_term_as_string);
 my $term_different_name = clone $term;
 $term_different_name->{name} = "different transport";
 
-try {
+use Capture::Tiny qw(capture);
+
+my ($stdout, $stderr, $exit) = capture {
   $term->merge($term_different_name);
-  fail("merge should have failed");
-} catch {
-  like ($_, qr/differs from name of/);
 };
 
+like ($stderr, qr/name" tag of this stanza differs from previously/);
 
-my $term_no_name = clone $term;
+my$term_no_name = clone $term;
 delete $term_no_name->{name};
 
 $term->merge($merge_term_clone);
@@ -141,10 +141,9 @@ my $term_name_clash_2 =
     name => 'name_2',
   });
 
-try {
+
+($stdout, $stderr, $exit) = capture {
   $term_name_clash_1->merge($term_name_clash_2);
-  fail("merge() should fail - names don't match");
-} catch {
-  my $error = $_;
-  like ($error, qr/differs from name/);
 };
+
+like ($stderr, qr/name" tag of this stanza differs from previously/);
