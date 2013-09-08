@@ -117,13 +117,14 @@ my %row_makers = (
         my $term = $_;
 
         my $dbxref_id = $chado_data->get_dbxref_by_termid($term->{id})->{dbxref_id};
+        my $is_relationshiptype = $term->{is_relationshiptype};
 
         if ($term->{is_obsolete}) {
           ();
         } else {
-          [$term->name(), $cv_id, $dbxref_id];
+          [$term->name(), $cv_id, $dbxref_id, $is_relationshiptype];
         }
-     } @cvterms;
+      } @cvterms;
     } $ontology_data->get_cv_names();
   },
 
@@ -133,7 +134,7 @@ my %table_column_names = (
   db => [qw(name)],
   dbxref => [qw(db_id accession)],
   cv => [qw(name)],
-  cvterm => [qw(name cv_id dbxref_id)],
+  cvterm => [qw(name cv_id dbxref_id is_relationshiptype)],
 );
 
 sub chado_store

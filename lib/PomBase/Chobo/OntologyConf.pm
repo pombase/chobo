@@ -85,8 +85,27 @@ our %field_conf = (
   is_a => {
     type => 'ARRAY',
   },
+  part_of => {
+    type => 'ARRAY',
+  },
   xref => {
     type => 'ARRAY',
+  },
+  relationship => {
+    type => 'ARRAY',
+    process => sub {
+      my $val = shift;
+
+      if ($val =~ /(.+?)\s+(\S+)$/) {
+        return {
+          relationship_name => $1,
+          other_term => $2,
+        }
+      } else {
+        warn "can't parse relationship: $val\n";
+        return undef;
+      }
+    },
   },
   synonym => {
     type => 'ARRAY',
