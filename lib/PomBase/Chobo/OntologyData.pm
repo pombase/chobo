@@ -52,6 +52,8 @@ has terms_by_name => (is => 'rw', init_arg => undef, isa => 'HashRef',
                       default => sub { {} });
 has terms_by_cv_name => (is => 'rw', init_arg => undef, isa => 'HashRef',
                          default => sub { {} });
+has relationships_by_cv_name => (is => 'rw', init_arg => undef, isa => 'HashRef',
+                                 default => sub { {} });
 has terms_by_db_name => (is => 'rw', init_arg => undef, isa => 'HashRef',
                          default => sub { {} });
 has metadata_by_namespace => (is => 'rw', init_arg => undef, isa => 'HashRef',
@@ -69,6 +71,7 @@ sub add
   my $terms_by_id = $self->terms_by_id();
   my $terms_by_name = $self->terms_by_name();
   my $terms_by_cv_name = $self->terms_by_cv_name();
+  my $relationships_by_cv_name = $self->relationships_by_cv_name();
 
   my $metadata_by_namespace = $self->metadata_by_namespace();
 
@@ -124,12 +127,18 @@ sub add
 
     if (defined $name) {
       $terms_by_name->{$name} = $term;
+    } else {
+      die "stanza without a name tag is unsupported:\n", $term->to_string(), "\n";
     }
 
     my $term_namespace = $term->namespace();
 
     if (defined $term_namespace) {
-      $terms_by_cv_name->{$term->{namespace}}->{$term->{id}} = $term;
+      $terms_by_cv_name->{$term_namespace}->{$name} = $term;
+
+      if ($term->{is_relationshiptype}) {
+        $relationships_by_cv_name->{$term_namespace}->{$name} = $term;
+      }
 
       if (!exists $metadata_by_namespace->{$term_namespace}) {
         $metadata_by_namespace->{$term_namespace} = clone $metadata;
