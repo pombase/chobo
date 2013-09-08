@@ -92,12 +92,19 @@ my %row_makers = (
      } keys %current_db_terms;
     } $ontology_data->get_db_names();
   },
+  cv => sub {
+    my $ontology_data = shift;
 
+    return map {
+      [$_];
+    } $ontology_data->get_cv_names();
+  },
 );
 
 my %table_column_names = (
   db => [qw(name)],
   dbxref => [qw(db_id accession)],
+  cv => [qw(name)],
 );
 
 sub chado_store
@@ -109,7 +116,7 @@ sub chado_store
 
   my $chado_data = $self->chado_data();
 
-  my @tables_to_store = qw(db dbxref);
+  my @tables_to_store = qw(db dbxref cv);
 
   for my $table_to_store (@tables_to_store) {
     my @rows = $row_makers{$table_to_store}->($self->ontology_data(),
