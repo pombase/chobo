@@ -60,10 +60,14 @@ sub _copy_to_table
     or die "failed to COPY into $table_name: ", $dbh->errstr, "\n";
 
   for my $row (@data) {
-    $dbh->pg_putcopydata((join "\t", @$row) . "\n");
+    if (!$dbh->pg_putcopydata((join "\t", @$row) . "\n")) {
+      die $dbh->errstr();
+    }
   }
 
-  $dbh->pg_putcopyend();
+  if (!$dbh->pg_putcopyend()) {
+    die $dbh->errstr();
+  }
 
   warn "COPY $table_name FROM STDIN finished\n";
 }

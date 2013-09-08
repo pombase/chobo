@@ -63,8 +63,8 @@ try {
   }
   $chobo->chado_store();
   warn "commiting\n";
-  $dbh->commit();
+  $dbh->commit() or die $dbh->errstr;
 } catch {
   warn "failed - rolling back: $_\n";
-  $dbh->rollback();
+  $dbh->rollback() or die $dbh->errstr;
 };
