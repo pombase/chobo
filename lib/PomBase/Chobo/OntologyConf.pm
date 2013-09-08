@@ -114,7 +114,7 @@ our %field_conf = (
 
         return \%ret;
       } else {
-        die "unknown synonym format: $val\n";
+        warn "unknown synonym format: $val\n";
         return undef;
       }
     },
