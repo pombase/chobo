@@ -44,6 +44,17 @@ our %field_conf = (
   name => {
     type => 'SINGLE',
   },
+  is_obsolete => {
+    type => 'SINGLE',
+    process => sub {
+      my $val = shift;
+      if ($val eq 'true') {
+        return 1;
+      } else {
+        return 0;
+      }
+    },
+ },
   namespace => {
     type => 'SINGLE',
     merge => sub {

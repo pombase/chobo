@@ -103,12 +103,37 @@ my %row_makers = (
       [$_];
     } $ontology_data->get_cv_names();
   },
+  cvterm => sub {
+    my $ontology_data = shift;
+    my $chado_data = shift;
+
+    map {
+      my $cv_name = $_;
+      my $cv_id = $chado_data->get_cv_by_name($cv_name)->{cv_id};
+
+      my @cvterms = $ontology_data->get_terms_by_cv_name($cv_name);
+
+      map {
+        my $term = $_;
+
+        my $dbxref_id = $chado_data->get_dbxref_by_termid($term->{id})->{dbxref_id};
+
+        if ($term->{is_obsolete}) {
+          ();
+        } else {
+          [$term->name(), $cv_id, $dbxref_id];
+        }
+     } @cvterms;
+    } $ontology_data->get_cv_names();
+  },
+
 );
 
 my %table_column_names = (
   db => [qw(name)],
   dbxref => [qw(db_id accession)],
   cv => [qw(name)],
+  cvterm => [qw(name cv_id dbxref_id)],
 );
 
 sub chado_store
@@ -120,7 +145,7 @@ sub chado_store
 
   my $chado_data = $self->chado_data();
 
-  my @tables_to_store = qw(db dbxref cv);
+  my @tables_to_store = qw(db dbxref cv cvterm);
 
   for my $table_to_store (@tables_to_store) {
     my @rows = $row_makers{$table_to_store}->($self->ontology_data(),
