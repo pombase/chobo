@@ -46,30 +46,6 @@ use PomBase::Chobo::OntologyData;
 has terms => (is => 'rw', init_arg => undef);
 
 
-sub _save_stanza_line
-{
-  my $stanza = shift;
-  my $line = shift;
-
-  if ($line =~ /^\s*(\S+):\s+(.+?)\s*$/) {
-    my $field_name = $1;
-    my $field_value = $2;
-
-    my $field_conf = $PomBase::Chobo::OntologyConf::field_conf{$field_name};
-
-    if (defined $field_conf) {
-      if (defined $field_conf->{process}) {
-        $field_value = $field_conf->{process}->($field_value);
-      }
-      if (defined $field_conf->{type} && $field_conf->{type} eq 'SINGLE') {
-        $stanza->{$field_name} = $field_value;
-      } else {
-        push @{$stanza->{$field_name}}, $field_value;
-      }
-    }
-  }
-}
-
 sub die_line
 {
   my $filename = shift;
@@ -173,7 +149,26 @@ sub parse
       $current->{line} = $line_number;
     } else {
       if ($current) {
-        _save_stanza_line($current, $line);
+        my @bits = split /: /, $line, 2;
+        if (@bits == 2) {
+          my $field_name = $bits[0];
+          my $field_value = $bits[1];
+
+          my $field_conf = $PomBase::Chobo::OntologyConf::field_conf{$field_name};
+
+          if (defined $field_conf) {
+            if (defined $field_conf->{process}) {
+              $field_value = $field_conf->{process}->($field_value);
+            }
+            if (defined $field_conf->{type} && $field_conf->{type} eq 'SINGLE') {
+              $current->{$field_name} = $field_value;
+            } else {
+              push @{$current->{$field_name}}, $field_value;
+            }
+          }
+        } else {
+          die "can't parse line - no colon: $line\n";
+        }
       } else {
         if ($line =~ /^(.+?):\s*(.*)/) {
           my ($key, $value) = ($1, $2);
