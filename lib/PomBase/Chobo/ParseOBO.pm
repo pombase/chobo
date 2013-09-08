@@ -160,10 +160,12 @@ sub parse
             if (defined $field_conf->{process}) {
               $field_value = $field_conf->{process}->($field_value);
             }
-            if (defined $field_conf->{type} && $field_conf->{type} eq 'SINGLE') {
-              $current->{$field_name} = $field_value;
-            } else {
-              push @{$current->{$field_name}}, $field_value;
+            if (defined $field_value) {
+              if (defined $field_conf->{type} && $field_conf->{type} eq 'SINGLE') {
+                $current->{$field_name} = $field_value;
+              } else {
+                push @{$current->{$field_name}}, $field_value;
+              }
             }
           }
         } else {
