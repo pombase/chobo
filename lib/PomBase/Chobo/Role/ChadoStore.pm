@@ -115,7 +115,7 @@ sub chado_store
     my @rows = $row_makers{$table_to_store}->($self->ontology_data(),
                                               $self->chado_data());
 
-$self->_copy_to_table($table_to_store, $table_column_names{$table_to_store},
+    $self->_copy_to_table($table_to_store, $table_column_names{$table_to_store},
                           \@rows);
   }
 
