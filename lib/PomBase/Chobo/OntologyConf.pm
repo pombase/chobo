@@ -97,11 +97,11 @@ our %field_conf = (
     process => sub {
       my $val = shift;
 
-      if ($val =~ /(.+?)\s+(\S+)$/) {
+      if ($val =~ /^\s*(\S+)\s+(\S+)\s*(?:\{(.*)\})?$/) {
         return {
           relationship_name => $1,
           other_term => $2,
-        }
+        };
       } else {
         warn "can't parse relationship: $val\n";
         return undef;
