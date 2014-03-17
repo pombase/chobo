@@ -240,7 +240,7 @@ sub _build_cvterm_data
 
   my %by_termid = map {
     my $termid = $_;
-    my $dbxref_id = $dbxref_by_termid->{$termid}->[0];
+    my $dbxref_id = $dbxref_by_termid->{$termid}->{dbxref_id};
     my $cvterm_data = $by_dbxref_id{$dbxref_id};
 
     if (defined $cvterm_data) {
