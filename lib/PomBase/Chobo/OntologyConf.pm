@@ -34,6 +34,7 @@ under the same terms as Perl itself.
 =cut
 
 use warnings;
+use Carp;
 
 use String::Strip;
 
@@ -104,6 +105,15 @@ our %field_conf = (
       } else {
         warn "can't parse relationship: $val\n";
         return undef;
+      }
+    },
+    to_string => sub {
+      my $val = shift;
+
+      if (ref $val) {
+        return $val->{relationship_name} . ' ' . $val->{other_term};
+      } else {
+        croak "can't output relationship '$val' - expected a reference";
       }
     },
   },
