@@ -82,15 +82,26 @@ sub bless_object
   bless $object, __PACKAGE__;
 }
 
+=head2 merge
+
+ Usage   : my $merged_term = $term->merge($other_term);
+ Function: Attempt to merge $other_term into this term.  Only merges if at least
+           one of the ID or alt_ids from this term match the ID or an alt_id
+           from $other_term
+ Args    : $other_term - the term to merge with
+ Return  : undef - if no id from this term matches one from $other_term
+           $self - if there is a match
+=cut
+
 sub merge
 {
   my $self = shift;
-  my $new_term = shift;
+  my $other_term = shift;
 
-  return if $self == $new_term;
+  return if $self == $other_term;
 
   my $lc = List::Compare->new([$self->{id}, @{$self->{alt_id}}],
-                              [$new_term->{id}, @{$new_term->{alt_id}}]);
+                              [$other_term->{id}, @{$other_term->{alt_id}}]);
 
   if (scalar($lc->get_intersection()) == 0) {
     return undef;
@@ -102,7 +113,7 @@ sub merge
 
   my $merge_field = sub {
     my $name = shift;
-    my $new_term = shift;
+    my $other_term = shift;
 
     my $field_conf = $PomBase::Chobo::OntologyConf::field_conf{$name};
 
@@ -110,13 +121,13 @@ sub merge
       if (defined $field_conf->{type} && $field_conf->{type} eq 'SINGLE') {
         my $res = undef;
         if (defined $field_conf->{merge}) {
-          $res = $field_conf->{merge}->($self, $new_term);
+          $res = $field_conf->{merge}->($self, $other_term);
         }
 
         if (defined $res) {
           $self->{$name} = $res;
         } else {
-          my $new_field_value = $new_term->{$name};
+          my $new_field_value = $other_term->{$name};
 
           if (defined $new_field_value) {
             if (defined $self->{$name}) {
@@ -124,7 +135,7 @@ sub merge
                 warn qq("$name" tag of this stanza differs from previously ) .
                   qq(seen value ") . $self->{$name} .
                   qq(" - ignoring new value:\n\n:) .
-                  $new_term->to_string() . "\n\n";
+                  $other_term->to_string() . "\n\n";
               }
             } else {
               $self->{$name} = $new_field_value;
@@ -134,7 +145,7 @@ sub merge
           }
         }
       } else {
-        my $new_field_value = $new_term->{$name};
+        my $new_field_value = $other_term->{$name};
         for my $single_value (@$new_field_value) {
           if (!grep { Compare($_, $single_value) } @{$self->{$name}}) {
             push @{$self->{$name}}, clone $single_value;
@@ -149,8 +160,8 @@ sub merge
   for my $field_name (@field_names) {
     next if $field_name eq 'id' or $field_name eq 'alt_id';
 
-    if (!Compare($self->{$field_name}, $new_term->{$field_name})) {
-      $merge_field->($field_name, $new_term);
+    if (!Compare($self->{$field_name}, $other_term->{$field_name})) {
+      $merge_field->($field_name, $other_term);
     }
   }
 
