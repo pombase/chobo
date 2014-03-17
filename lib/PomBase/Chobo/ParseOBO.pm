@@ -71,12 +71,13 @@ sub _finish_stanza
     $current->{namespace} =
       $metadata_ref->{'default-namespace'};
 
-    # the namespace may be undef, temporary - hopefully it will merge with a
+    # the namespace may be undef, temporarily - hopefully it will merge with a
     # term/stanza that has a namespace before we use it
   }
 
-  $current->{filename} = $filename;
   $current->{metadata} = $metadata_ref;
+
+  $current->{source_file} = $filename;
 
   PomBase::Chobo::OntologyTerm::bless_object($current);
 
@@ -145,8 +146,10 @@ sub parse
           die "unknown stanza type '[$stanza_type]'\n";
         }
       }
-      $current = { is_relationshiptype => $is_relationshiptype };
-      $current->{line} = $line_number;
+      $current = {
+        is_relationshiptype => $is_relationshiptype,
+        source_file_line_number => $line_number,
+      };
     } else {
       if ($current) {
         my @bits = split /: /, $line, 2;

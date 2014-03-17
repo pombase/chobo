@@ -36,6 +36,7 @@ under the same terms as Perl itself.
 =cut
 
 use Mouse;
+use Carp;
 
 use PomBase::Chobo::OntologyConf;
 
@@ -43,11 +44,13 @@ use Clone qw(clone);
 use Data::Compare;
 use List::Compare;
 
-has id => (is => 'ro', isa => 'Str');
+has id => (is => 'ro', isa => 'Str', required => 1);
 has name => (is => 'ro', isa => 'Str');
 has namespace => (is => 'ro', isa => 'Str');
 has alt_id => (is => 'ro', isa => 'ArrayRef');
 has is_relationshiptype => (is => 'ro', isa => 'Bool');
+has source_file => (is => 'ro', isa => 'Str', required => 1);
+has source_file_line_number => (is => 'ro', isa => 'Str', required => 1);
 
 our @field_names;
 our %field_conf;
@@ -70,7 +73,8 @@ sub bless_object
   my ($db_name, $accession);
 
   unless (($db_name, $accession) = $object->{id} =~ /^(\S+):(.+?)\s*$/) {
-    $db_name = $object->{namespace} // $object->{ontology} // $object->{filename};
+    $db_name = $object->{namespace} //
+      $object->{ontology} // $object->{source_file};
     $accession = $object->{id};
 
     $object->{id} = "$db_name:$accession";
@@ -78,6 +82,14 @@ sub bless_object
 
   $object->{accession} = $accession;
   $object->{db_name} = $db_name;
+
+  if (!defined $object->{source_file}) {
+    confess "source_file attribute of object is required\n";
+  }
+
+  if (!defined $object->{source_file_line_number}) {
+    confess "source_file_line attribute of object is required\n";
+  }
 
   bless $object, __PACKAGE__;
 }
@@ -132,10 +144,18 @@ sub merge
           if (defined $new_field_value) {
             if (defined $self->{$name}) {
               if ($self->{$name} ne $new_field_value) {
-                warn qq("$name" tag of this stanza differs from previously ) .
-                  qq(seen value ") . $self->{$name} .
-                  qq(" - ignoring new value:\n\n:) .
-                  $other_term->to_string() . "\n\n";
+                warn qq|"$name" tag of this stanza (from |,
+                  $other_term->source_file(), " line ",
+                  $other_term->source_file_line_number(), ") ",
+                  "differs from previously ",
+                  "seen value (from ", $self->source_file(),
+                  " line ", $self->source_file_line_number(), q|) "|,
+                  $self->{$name}, ") ",
+                  qq(" - ignoring new value:\n\n),
+                  $other_term->to_string() . "\n\n",
+                  "merging into:\n\n",
+                  $self->to_string(), "\n\n";
+
               }
             } else {
               $self->{$name} = $new_field_value;
