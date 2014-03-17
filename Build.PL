@@ -23,6 +23,7 @@ my $builder = Module::Build->new(
         'List::Compare' => 0,
         'Mouse' => 0,
         'Capture::Tiny' => 0,
+        'Data::Dumper' => 0,
     },
     add_to_cleanup      => [ 'PomBase-Chobo-*' ],
     create_makefile_pl => 'traditional',
