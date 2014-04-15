@@ -42,6 +42,13 @@ requires 'chado_data';
 requires 'ontology_data';
 
 use PomBase::Chobo::ChadoData;
+use PomBase::Chobo::OntologyConf;
+
+our @relationship_cv_names;
+
+BEGIN {
+  @relationship_cv_names = @PomBase::Chobo::OntologyConf::relationship_cv_names;
+}
 
 sub _copy_to_table
 {
@@ -71,6 +78,23 @@ sub _copy_to_table
 
   warn "COPY $table_name FROM STDIN finished\n";
 }
+
+sub _get_relationship_term
+{
+  my $self = shift;
+  my $chado_data = shift;
+  my $rel_name = shift;
+  my $rel_cv_names_ref = shift;
+
+  my @rel_cv_names = @$rel_cv_names_ref;
+
+  for my $rel_cv_name (@rel_cv_names) {
+    my $cv_id = $chado_data->get_cv_by_name($rel_cv_name)->{cv_id};
+
+    my $get_cvterm_by_cv_i
+  }
+}
+
 
 my %row_makers = (
   db => sub {
@@ -127,7 +151,31 @@ my %row_makers = (
       } @cvterms;
     } $ontology_data->get_cv_names();
   },
-
+#   cvterm_relationship = sub {
+#     my $ontology_data = shift;
+#     my $chado_data = shift;
+#
+#     my $is_a_cvterm = $self->_get_relationship_term($chado_data, 'is_a',
+#                                                     [@relationship_cv_names]);
+#
+#     map {
+#       my $cv_name = $_;
+#       my $cv_id = $chado_data->get_cv_by_name($cv_name)->{cv_id};
+#
+#       my @cvterms = $ontology_data->get_terms_by_cv_name($cv_name);
+#
+#       map {
+#         my $term = $_;
+#
+# #        if (
+#
+#         my $subject_id = $chado_data->get_cvterm_by_termid($term->{id});
+#         my $rel_name = $
+#
+#         [$term->name(), $cv_id, $dbxref_id, $is_relationshiptype];
+#       } @cvterms;
+#     } $ontology_data->get_cv_names();
+#   },
 );
 
 my %table_column_names = (
@@ -135,6 +183,7 @@ my %table_column_names = (
   dbxref => [qw(db_id accession)],
   cv => [qw(name)],
   cvterm => [qw(name cv_id dbxref_id is_relationshiptype)],
+  cvterm_relationship => [qw(subject_id type_id object_id)],
 );
 
 sub chado_store

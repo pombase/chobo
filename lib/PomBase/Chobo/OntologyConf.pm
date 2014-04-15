@@ -38,6 +38,8 @@ use Carp;
 
 use String::Strip;
 
+our @relationship_cv_names = qw(relationship);
+
 our %field_conf = (
   id => {
     type => 'SINGLE',
