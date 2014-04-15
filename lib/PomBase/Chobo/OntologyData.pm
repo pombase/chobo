@@ -128,7 +128,7 @@ sub add
     if (defined $name) {
       $terms_by_name->{$name} = $term;
     } else {
-      die "stanza without a name tag is unsupported:\n", $term->to_string(), "\n";
+      die "term without a name tag is unsupported:\n", $term->to_string(), "\n";
     }
 
     my $term_namespace = $term->namespace();
