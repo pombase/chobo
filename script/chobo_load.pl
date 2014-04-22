@@ -3,6 +3,8 @@
 use Mouse;
 use Try::Tiny;
 
+use lib qw(lib);
+
 use DBI;
 
 use PomBase::Chobo;
