@@ -119,7 +119,7 @@ sub parse
 
   while (defined (my $line = <$fh>)) {
     chomp $line;
-    $line =~ s/!.*//;
+    $line =~ s/![^"\n]*$//;
     StripLTSpace($line);
 
     next if length $line == 0;
