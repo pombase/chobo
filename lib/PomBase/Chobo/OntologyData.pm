@@ -76,13 +76,12 @@ sub add
   my $metadata_by_namespace = $self->metadata_by_namespace();
 
   my $proc = sub {
-    my $new_term = shift;
-    PomBase::Chobo::OntologyTerm::bless_object($new_term);
+    my $term = shift;
 
-    my @new_term_ids = ($new_term->{id});
+    my @new_term_ids = ($term->{id});
 
-    if (defined $new_term->{alt_id}) {
-      push @new_term_ids, @{$new_term->{alt_id}};
+    if (defined $term->{alt_id}) {
+      push @new_term_ids, @{$term->{alt_id}};
     }
 
     my @found_existing_terms = ();
@@ -97,8 +96,6 @@ sub add
       }
     }
 
-    my $term = $new_term;
-
     if (@found_existing_terms > 1) {
       die "two terms match an alt_id field from:\n" .
         $term->to_string() . "\n\nmatching term 1:\n" .
@@ -109,8 +106,6 @@ sub add
         my $existing_term = $found_existing_terms[0];
         $existing_term->merge($term);
         $term = $existing_term;
-      } else {
-        PomBase::Chobo::OntologyTerm::bless_object($term);
       }
     }
 

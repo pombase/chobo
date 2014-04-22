@@ -43,9 +43,6 @@ use String::Strip;
 
 use PomBase::Chobo::OntologyData;
 
-has terms => (is => 'rw', init_arg => undef);
-
-
 sub die_line
 {
   my $filename = shift;
@@ -79,9 +76,7 @@ sub _finish_stanza
 
   $current->{source_file} = $filename;
 
-  PomBase::Chobo::OntologyTerm::bless_object($current);
-
-  push @$terms_ref, $current;
+  push @$terms_ref, PomBase::Chobo::OntologyTerm->new($current);
 }
 
 sub fatal
@@ -197,13 +192,11 @@ sub parse
 
   close $fh or die "can't close $filename: $!";
 
-  $self->terms(\@terms);
-
   try {
     $ontology_data->add(metadata => \%metadata,
                         terms => \@terms);
   } catch {
-    die "$filename: $_\n";
+    die "failed while reading $filename: $_\n";
   }
 }
 

@@ -8,7 +8,7 @@ use PomBase::Chobo::OntologyTerm;
 
 my $alt_id_1 = "GO:0015457";
 my $alt_id_2 = "GO:0015460";
-my $term = {
+my $term_arg = {
   id => "GO:0006810",
   name => "transport",
   namespace => "biological_process",
@@ -25,9 +25,11 @@ my $term = {
       dbxrefs => [],
     }
   ],
+  source_file_line_number => __LINE__,
+  source_file => $0,
 };
 
-PomBase::Chobo::OntologyTerm::bless_object($term);
+my $term = PomBase::Chobo::OntologyTerm->new($term_arg);
 
 is (ref $term, "PomBase::Chobo::OntologyTerm");
 
@@ -46,8 +48,10 @@ synonym: small molecule transport NARROW []";
 is ($term->to_string(), $expected_term_as_string);
 
 my $merge_term_no_values =
-  PomBase::Chobo::OntologyTerm::bless_object({
+  PomBase::Chobo::OntologyTerm->new({
     id => "GO:0006810",
+    source_file_line_number => __LINE__,
+    source_file => $0,
   });
 
 $term->merge($merge_term_no_values);
@@ -72,7 +76,8 @@ my ($stdout, $stderr, $exit) = capture {
   $term->merge($term_different_name);
 };
 
-like ($stderr, qr/name" tag of this stanza differs from previously/);
+like ($stderr, qr/name" tag of this stanza .* differs from previously/,
+      'term merge error');
 
 my$term_no_name = clone $term;
 delete $term_no_name->{name};
@@ -87,9 +92,11 @@ is ($term_no_name->to_string(), $expected_term_as_string);
 
 my @extra_alt_ids = ("GO:222222", "GO:111111");
 my $term_extra_alt_id =
-  PomBase::Chobo::OntologyTerm::bless_object({
+  PomBase::Chobo::OntologyTerm->new({
     id => "GO:0006810",
     alt_id => [@extra_alt_ids],
+    source_file_line_number => __LINE__,
+    source_file => $0,
   });
 
 $term_extra_alt_id->merge($term);
@@ -102,10 +109,12 @@ my $merge_id = "GO:0012345";
 
 sub make_test_merge_term
 {
-  return PomBase::Chobo::OntologyTerm::bless_object({
+  return PomBase::Chobo::OntologyTerm->new({
     id => $merge_id,
     alt_id =>  [$term->id(), $merge_alt_id],
     is_a => ["GO:33333"],
+    source_file_line_number => __LINE__,
+    source_file => $0,
   });
 }
 
@@ -128,17 +137,21 @@ cmp_deeply([sort @{$alt_merged->alt_id()}],
 
 
 my $term_name_clash_1 =
-  PomBase::Chobo::OntologyTerm::bless_object({
+  PomBase::Chobo::OntologyTerm->new({
     id => "GO:0006810",
     alt_id => ["GO:0012345"],
     name => 'name_1',
+    source_file_line_number => __LINE__,
+    source_file => $0,
   });
 
 my $term_name_clash_2 =
-  PomBase::Chobo::OntologyTerm::bless_object({
+  PomBase::Chobo::OntologyTerm->new({
     id => "GO:0012345",
     alt_id => ["GO:0006810"],
     name => 'name_2',
+    source_file_line_number => __LINE__,
+    source_file => $0,
   });
 
 
@@ -146,4 +159,4 @@ my $term_name_clash_2 =
   $term_name_clash_1->merge($term_name_clash_2);
 };
 
-like ($stderr, qr/name" tag of this stanza differs from previously/);
+like ($stderr, qr/name" tag of this stanza .* differs from previously/);

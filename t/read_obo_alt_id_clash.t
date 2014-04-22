@@ -19,4 +19,4 @@ my ($stdout, $stderr, $exit) = capture {
                  ontology_data => $ontology_data);
 };
 
-like ($stderr, qr/name" tag of this stanza differs from previously/);
+like ($stderr, qr/name" tag of this stanza .* differs from previously/);

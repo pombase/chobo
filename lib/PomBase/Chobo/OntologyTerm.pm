@@ -64,9 +64,16 @@ BEGIN {
   }
 }
 
-sub bless_object
+sub new
 {
-  my $object = shift;
+  my $class = shift;
+  my $arg = shift;
+
+  if (!defined $arg) {
+    croak "no argument passed to new()";
+  }
+
+  my $object = clone $arg;
 
   $object->{alt_id} //= [];
 
@@ -91,7 +98,7 @@ sub bless_object
     confess "source_file_line attribute of object is required\n";
   }
 
-  bless $object, __PACKAGE__;
+  return bless $object, $class;
 }
 
 =head2 merge
@@ -150,8 +157,8 @@ sub merge
                   "differs from previously ",
                   "seen value (from ", $self->source_file(),
                   " line ", $self->source_file_line_number(), q|) "|,
-                  $self->{$name}, ") ",
-                  qq(" - ignoring new value:\n\n),
+                  $self->{$name}, '" ',
+                  qq(" - ignoring new value: $new_field_value\n\n),
                   $other_term->to_string() . "\n\n",
                   "merging into:\n\n",
                   $self->to_string(), "\n\n";
