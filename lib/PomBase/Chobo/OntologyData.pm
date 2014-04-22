@@ -97,7 +97,7 @@ sub add
     }
 
     if (@found_existing_terms > 1) {
-      die "two terms match an alt_id field from:\n" .
+      die "two previously read terms match an alt_id field from:\n" .
         $term->to_string() . "\n\nmatching term 1:\n" .
         $found_existing_terms[0]->to_string() . "\n\nmatching term 2:\n" .
         $found_existing_terms[1]->to_string() . "\n";
