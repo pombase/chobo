@@ -42,6 +42,7 @@ use Mouse;
 
 use Clone qw(clone);
 use Try::Tiny;
+use Carp;
 
 use PomBase::Chobo::OntologyTerm;
 
@@ -121,9 +122,12 @@ sub add
     my $name = $term->{name};
 
     if (defined $name) {
-      $terms_by_name->{$name} = $term;
+      if (!exists $terms_by_name->{$name} ||
+          !grep { $_ == $term } @{$terms_by_name->{$name}}) {
+        push @{$terms_by_name->{$name}}, $term;
+      }
     } else {
-      die "term without a name tag is unsupported:\n", $term->to_string(), "\n";
+      croak "term without a name tag is unsupported:\n", $term->to_string(), "\n";
     }
 
     my $term_namespace = $term->namespace();
@@ -144,15 +148,15 @@ sub add
   map { $proc->($_); } @{$terms};
 }
 
-sub term_by_name
+sub get_terms_by_name
 {
   my $self = shift;
   my $name = shift;
 
-  return $self->terms_by_name()->{$name};
+  return @{$self->terms_by_name()->{$name} // []};
 }
 
-sub term_by_id
+sub get_term_by_id
 {
   my $self = shift;
   my $id = shift;
