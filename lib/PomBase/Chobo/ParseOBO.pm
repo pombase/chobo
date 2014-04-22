@@ -156,7 +156,11 @@ sub parse
 
           if (defined $field_conf) {
             if (defined $field_conf->{process}) {
-              $field_value = $field_conf->{process}->($field_value);
+              try {
+                $field_value = $field_conf->{process}->($field_value);
+              } catch {
+                warn qq(warning "$_" at $filename line $.\n);
+              };
             }
             if (defined $field_value) {
               if (defined $field_conf->{type} && $field_conf->{type} eq 'SINGLE') {

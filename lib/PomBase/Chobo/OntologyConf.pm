@@ -145,8 +145,7 @@ our %field_conf = (
 
         return \%ret;
       } else {
-        warn "unknown synonym format: $val\n";
-        return undef;
+        die "unknown synonym format: $val\n";
       }
     },
     to_string => sub {
