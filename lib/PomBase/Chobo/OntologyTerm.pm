@@ -151,16 +151,16 @@ sub merge
           if (defined $new_field_value) {
             if (defined $self->{$name}) {
               if ($self->{$name} ne $new_field_value) {
-                warn qq|"$name" tag of this stanza (from |,
+                warn qq|new "$name" tag of this stanza (from |,
                   $other_term->source_file(), " line ",
                   $other_term->source_file_line_number(), ") ",
                   "differs from previously ",
                   "seen value (from ", $self->source_file(),
                   " line ", $self->source_file_line_number(), q|) "|,
                   $self->{$name}, '" ',
-                  qq(" - ignoring new value: $new_field_value\n\n),
-                  $other_term->to_string() . "\n\n",
-                  "merging into:\n\n",
+                  qq(- ignoring new value: "$new_field_value"\n\n),
+                  "while merging: \n" . $other_term->to_string() . "\n\n",
+                  "into existing term:\n",
                   $self->to_string(), "\n\n";
 
               }
