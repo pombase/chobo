@@ -60,6 +60,16 @@ has terms_by_db_name => (is => 'rw', init_arg => undef, isa => 'HashRef',
 has metadata_by_namespace => (is => 'rw', init_arg => undef, isa => 'HashRef',
                               default => sub { {} });
 
+=head2 add
+
+ Usage   : $ontology_data->add(metadata => {..}, terms => [...]);
+ Function: Add some terms, often all terms from one OBO file
+ Args    : metadata - the metadata for the terms
+           terms - an array of OntologyTerm objects
+ Return  : Nothing, dies on error
+
+=cut
+
 sub add
 {
   my $self = shift;
