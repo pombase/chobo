@@ -52,7 +52,7 @@ has new_terms => (is => 'rw', init_arg => undef);
 has new_synonyms => (is => 'rw', init_arg => undef);
 has remove_synonyms => (is => 'rw', init_arg => undef);
 has chado_data => (is => 'ro', init_arg => undef, lazy_build => 1);
-has ontology_data => (is => 'ro', init_arg => undef, lazy_build => 1);
+has ontology_data => (is => 'ro', required => 1);
 has parser => (is => 'ro', init_arg => undef, lazy_build => 1);
 
 with 'PomBase::Chobo::Role::ChadoStore';
@@ -71,13 +71,6 @@ sub _build_parser
   return PomBase::Chobo::ParseOBO->new();
 }
 
-sub _build_ontology_data
-{
-  my $self = shift;
-
-  return PomBase::Chobo::OntologyData->new();
-}
-
 sub read_obo
 {
   my $self = shift;
@@ -90,5 +83,7 @@ sub read_obo
 
   $parser->parse(filename => $filename, ontology_data => $ontology_data);
 }
+
+# sub chado_store() - from PomBase::Chobo::ChadoStore
 
 1;
