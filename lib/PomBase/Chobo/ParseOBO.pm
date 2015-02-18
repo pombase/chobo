@@ -174,6 +174,7 @@ sub parse
           die "can't parse line - no colon: $line\n";
         }
       } else {
+        # we're parsing metadata
         if ($line =~ /^(.+?):\s*(.*)/) {
           my ($key, $value) = ($1, $2);
 
