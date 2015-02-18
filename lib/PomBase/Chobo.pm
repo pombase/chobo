@@ -48,9 +48,6 @@ use PomBase::Chobo::OntologyData;
 
 
 has dbh => (is => 'ro');
-has new_terms => (is => 'rw', init_arg => undef);
-has new_synonyms => (is => 'rw', init_arg => undef);
-has remove_synonyms => (is => 'rw', init_arg => undef);
 has chado_data => (is => 'ro', init_arg => undef, lazy_build => 1);
 has ontology_data => (is => 'ro', required => 1);
 has parser => (is => 'ro', init_arg => undef, lazy_build => 1);
