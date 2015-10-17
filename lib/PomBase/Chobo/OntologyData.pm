@@ -53,7 +53,7 @@ has terms_by_name => (is => 'rw', init_arg => undef, isa => 'HashRef',
                       default => sub { {} });
 has terms_by_cv_name => (is => 'rw', init_arg => undef, isa => 'HashRef',
                          default => sub { {} });
-has relationships_by_cv_name => (is => 'rw', init_arg => undef, isa => 'HashRef',
+has relationship_terms_by_cv_name => (is => 'rw', init_arg => undef, isa => 'HashRef',
                                  default => sub { {} });
 has terms_by_db_name => (is => 'rw', init_arg => undef, isa => 'HashRef',
                          default => sub { {} });
@@ -82,7 +82,7 @@ sub add
   my $terms_by_id = $self->terms_by_id();
   my $terms_by_name = $self->terms_by_name();
   my $terms_by_cv_name = $self->terms_by_cv_name();
-  my $relationships_by_cv_name = $self->relationships_by_cv_name();
+  my $relationship_terms_by_cv_name = $self->relationship_terms_by_cv_name();
 
   my $metadata_by_namespace = $self->metadata_by_namespace();
 
@@ -146,7 +146,7 @@ sub add
       $terms_by_cv_name->{$term_namespace}->{$name} = $term;
 
       if ($term->{is_relationshiptype}) {
-        $relationships_by_cv_name->{$term_namespace}->{$name} = $term;
+        $relationship_terms_by_cv_name->{$term_namespace}->{$name} = $term;
       }
 
       if (!exists $metadata_by_namespace->{$term_namespace}) {
