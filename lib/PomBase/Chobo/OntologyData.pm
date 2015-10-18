@@ -86,9 +86,7 @@ sub add
 
   my $metadata_by_namespace = $self->metadata_by_namespace();
 
-  my $proc = sub {
-    my $term = shift;
-
+  for my $term (@$terms) {
     my @new_term_ids = ($term->{id});
 
     if (defined $term->{alt_id}) {
@@ -153,9 +151,7 @@ sub add
         $metadata_by_namespace->{$term_namespace} = clone $metadata;
       }
     }
-  };
-
-  map { $proc->($_); } @{$terms};
+  }
 }
 
 sub get_terms_by_name
