@@ -264,3 +264,9 @@ namespace: fission_yeast_phenotype
 comment: relation binding a relational quality or disposition to the relevant type of entity
 xref: OBO_REL:towards
 
+[Typedef]
+id: output_of
+name: output_of
+synonym: "formation results from" EXACT [PomBase:mah]
+xref: RO:0002353
+property_value: usage "Inverse of has_output. Relation between a structure and a process that forms it, or between one process and a preceding process; A output_of B used where B has_output A isn't always true. Implies that process B is the only way to get output. Used in FYPO where one phenotype (c) always results when another phenotype (p) is present. Phenotype (p) may have other consequences in addition to phenotype (c)." xsd:string
