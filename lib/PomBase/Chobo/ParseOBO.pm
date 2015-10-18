@@ -73,8 +73,21 @@ sub _finish_stanza
   }
 
   $current->{metadata} = $metadata_ref;
-
   $current->{source_file} = $filename;
+  $current->{relationship} //= [];
+
+  if ($current->{is_a}) {
+    map {
+      push @{$current->{relationship}},
+        {
+          'relationship_name' => 'is_a',
+          'other_term' => $_,
+        };
+    } @{$current->{is_a}};
+
+    delete $current->{is_a};
+  }
+
 
   push @$terms_ref, PomBase::Chobo::OntologyTerm->new($current);
 }
