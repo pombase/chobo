@@ -121,14 +121,14 @@ our %field_conf = (
     type => 'ARRAY',
     process => sub {
       my $val = shift;
-      if ($val =~ /^"(.+)"\s*(.*)/) {
+      if ($val =~ /^"(.+?)"\s*(.*)/) {
         my $synonym = $1;
         my $rest = $2;
         my %ret = (
           synonym => $synonym,
         );
 
-        if ($rest =~ /(\S+)\s+(?:(?:(\S+)\s+)?(?:\s+\[(.*)\]))?/) {
+        if ($rest =~ /^\s*(\S+)\s+(?:(?:(\S+)\s+)?(?:\s+\[([^\]]*)\]))?/) {
           my ($scope, $type, $dbxrefs) = ($1, $2, $3);
 
           $ret{scope} = $scope;
