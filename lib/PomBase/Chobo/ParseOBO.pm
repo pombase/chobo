@@ -37,7 +37,6 @@ under the same terms as Perl itself.
 =cut
 
 use Mouse;
-use Try::Tiny;
 use FileHandle;
 use String::Strip;
 
@@ -169,11 +168,12 @@ sub parse
 
           if (defined $field_conf) {
             if (defined $field_conf->{process}) {
-              try {
+              eval {
                 $field_value = $field_conf->{process}->($field_value);
-              } catch {
-                warn qq(warning "$_" at $filename line $.\n);
               };
+              if ($@) {
+                warn qq(warning "$@" at $filename line $.\n);
+              }
             }
             if (defined $field_value) {
               if (defined $field_conf->{type} && $field_conf->{type} eq 'SINGLE') {
@@ -210,11 +210,12 @@ sub parse
 
   close $fh or die "can't close $filename: $!";
 
-  try {
+  eval {
     $ontology_data->add(metadata => \%metadata,
                         terms => \@terms);
-  } catch {
-    die "failed while reading $filename: $_\n";
+  };
+  if ($@) {
+    die "failed while reading $filename: $@\n";
   }
 }
 
