@@ -129,7 +129,10 @@ sub parse
 
   my $fh = FileHandle->new($filename, 'r') or die "can't open $filename: $!";
 
+  my $line_number = 0;;
+
   while (defined (my $line = <$fh>)) {
+    $line_number++;
     chomp $line;
     $line =~ s/![^"\n]*$//;
     StripLTSpace($line);
@@ -144,7 +147,6 @@ sub parse
       }
 
       my $is_relationshiptype = 0;
-      my $line_number = $fh->input_line_number();
 
       if ($stanza_type eq 'Typedef') {
         $is_relationshiptype = 1;
