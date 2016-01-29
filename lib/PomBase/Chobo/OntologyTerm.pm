@@ -167,7 +167,6 @@ sub merge
                   "while merging: \n" . $other_term->to_string() . "\n\n",
                   "into existing term:\n",
                   $self->to_string(), "\n\n";
-
               }
             } else {
               $self->{$name} = $new_field_value;
