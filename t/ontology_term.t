@@ -29,7 +29,7 @@ my $term_arg = {
   source_file => $0,
 };
 
-my $term = PomBase::Chobo::OntologyTerm->new($term_arg);
+my $term = PomBase::Chobo::OntologyTerm->make_object($term_arg);
 
 is (ref $term, "PomBase::Chobo::OntologyTerm");
 
@@ -48,7 +48,7 @@ synonym: small molecule transport NARROW []";
 is ($term->to_string(), $expected_term_as_string);
 
 my $merge_term_no_values =
-  PomBase::Chobo::OntologyTerm->new({
+  PomBase::Chobo::OntologyTerm->make_object({
     id => "GO:0006810",
     source_file_line_number => __LINE__,
     source_file => $0,
@@ -92,7 +92,7 @@ is ($term_no_name->to_string(), $expected_term_as_string);
 
 my @extra_alt_ids = ("GO:222222", "GO:111111");
 my $term_extra_alt_id =
-  PomBase::Chobo::OntologyTerm->new({
+  PomBase::Chobo::OntologyTerm->make_object({
     id => "GO:0006810",
     alt_id => [@extra_alt_ids],
     source_file_line_number => __LINE__,
@@ -109,7 +109,7 @@ my $merge_id = "GO:0012345";
 
 sub make_test_merge_term
 {
-  return PomBase::Chobo::OntologyTerm->new({
+  return PomBase::Chobo::OntologyTerm->make_object({
     id => $merge_id,
     alt_id =>  [$term->id(), $merge_alt_id],
     is_a => ["GO:33333"],
@@ -137,7 +137,7 @@ cmp_deeply([sort @{$alt_merged->alt_id()}],
 
 
 my $term_name_clash_1 =
-  PomBase::Chobo::OntologyTerm->new({
+  PomBase::Chobo::OntologyTerm->make_object({
     id => "GO:0006810",
     alt_id => ["GO:0012345"],
     name => 'name_1',
@@ -146,7 +146,7 @@ my $term_name_clash_1 =
   });
 
 my $term_name_clash_2 =
-  PomBase::Chobo::OntologyTerm->new({
+  PomBase::Chobo::OntologyTerm->make_object({
     id => "GO:0012345",
     alt_id => ["GO:0006810"],
     name => 'name_2',

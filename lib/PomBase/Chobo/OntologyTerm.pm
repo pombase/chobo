@@ -64,16 +64,21 @@ BEGIN {
   }
 }
 
-sub new
+=head2 make_object
+
+ Usage   : my $object = PomBase::Chobo::OntologyTerm->make_object($args);
+ Function: Turn $args into an OntologyTerm
+
+=cut
+
+sub make_object
 {
   my $class = shift;
-  my $arg = shift;
+  my $object = shift;
 
-  if (!defined $arg) {
+  if (!defined $object) {
     croak "no argument passed to new()";
   }
-
-  my $object = clone $arg;
 
   $object->{alt_id} //= [];
 

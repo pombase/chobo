@@ -89,7 +89,7 @@ sub _finish_stanza
   }
 
 
-  push @$terms_ref, PomBase::Chobo::OntologyTerm->new($current);
+  push @$terms_ref, PomBase::Chobo::OntologyTerm->make_object($current);
 }
 
 sub fatal
