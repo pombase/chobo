@@ -135,7 +135,8 @@ sub add
         push @{$terms_by_name->{$name}}, $term;
       }
     } else {
-      croak "term without a name tag is unsupported:\n", $term->to_string(), "\n";
+      warn "term without a name tag ignored:\n", $term->to_string(), "\n\n";
+      next;
     }
 
     my $term_namespace = $term->namespace();
