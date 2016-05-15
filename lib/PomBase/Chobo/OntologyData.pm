@@ -59,6 +59,8 @@ has terms_by_db_name => (is => 'rw', init_arg => undef, isa => 'HashRef',
                          default => sub { {} });
 has metadata_by_namespace => (is => 'rw', init_arg => undef, isa => 'HashRef',
                               default => sub { {} });
+has term_relationships => (is => 'rw', init_arg => undef, isa => 'HashRef',
+                           default => sub { {} });
 
 =head2 add
 
@@ -152,6 +154,14 @@ sub add
         $metadata_by_namespace->{$term_namespace} = clone $metadata;
       }
     }
+
+    if ($term->{relationship}) {
+      for my $rel (@{$term->{relationship}}) {
+        my $key = $term->{id} . '<' . $rel->{relationship_name} .
+          '>' . $rel->{other_term};
+        $self->term_relationships()->{$key} = 1;
+      }
+    }
   }
 }
 
@@ -221,6 +231,20 @@ sub get_metadata_by_namespace
   my $namespace = shift;
 
   return $self->metadata_by_namespace()->{$namespace};
+}
+
+sub relationships
+{
+  my $self = shift;
+
+  return map {
+    my ($subject_id, $rel_name, $object_id) = /(.*)<(.*)>(.*)/;
+    {
+      subject_id => $subject_id,
+      rel_name => $rel_name,
+      object_id => $object_id,
+    }
+  } keys %{$self->term_relationships()};
 }
 
 1;

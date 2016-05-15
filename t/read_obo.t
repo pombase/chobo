@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 14;
+use Test::More tests => 16;
 use Test::Deep;
 
 use PomBase::Chobo::ParseOBO;
@@ -50,6 +50,34 @@ is (@fypo_relationships, 4);
 
 my @fypo_non_relationships = grep { !$_->is_relationshiptype(); } @fypo_cvterms;
 is (@fypo_non_relationships, 20);
+
+my @rels = sort {
+  $a->{subject_id} cmp $b->{subject_id}
+    ||
+  $a->{rel_name} cmp $b->{rel_name}
+    ||
+  $a->{object_id} cmp $b->{object_id}
+} $ontology_data->relationships();
+
+is(@rels, 27);
+
+cmp_deeply([@rels[0..2]], [
+          {
+            'object_id' => 'FYPO:0000001',
+            'rel_name' => 'is_a',
+            'subject_id' => 'FYPO:0000002'
+          },
+          {
+            'rel_name' => 'is_a',
+            'subject_id' => 'FYPO:0000005',
+            'object_id' => 'FYPO:0000136'
+          },
+          {
+            'object_id' => 'FYPO:0000005',
+            'subject_id' => 'FYPO:0000013',
+            'rel_name' => 'is_a'
+          },
+        ]);
 
 
 my $single_term_ontology_data = PomBase::Chobo::OntologyData->new();
