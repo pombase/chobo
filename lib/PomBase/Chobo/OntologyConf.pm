@@ -42,6 +42,11 @@ our %field_conf = (
   },
   name => {
     type => 'SINGLE',
+    process => sub {
+      my $val = shift;
+      $val =~ s/\\"/"/g;
+      $val;
+    }
   },
   is_obsolete => {
     type => 'SINGLE',
