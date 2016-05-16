@@ -38,7 +38,6 @@ under the same terms as Perl itself.
 
 use Mouse;
 use FileHandle;
-use String::Strip;
 
 use PomBase::Chobo::OntologyData;
 
@@ -136,7 +135,8 @@ sub parse
     $line_number++;
     chomp $line;
     $line =~ s/![^"\n]*$//;
-    StripLTSpace($line);
+    $line =~ s/\s+$//;
+    $line =~ s/^\s+//;
 
     next if length $line == 0;
 

@@ -36,8 +36,6 @@ under the same terms as Perl itself.
 use warnings;
 use Carp;
 
-use String::Strip;
-
 our %field_conf = (
   id => {
     type => 'SINGLE',

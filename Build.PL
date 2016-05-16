@@ -17,7 +17,6 @@ my $builder = Module::Build->new(
         'DBI' => 0,
         'DBD::Pg' => 0,
         'Clone' => 0,
-        'String::Strip' => 0,
         'Try::Tiny' => 0,
         'Data::Compare' => 0,
         'List::Compare' => 0,
