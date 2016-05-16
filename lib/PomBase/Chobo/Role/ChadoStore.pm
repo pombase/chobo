@@ -68,7 +68,7 @@ sub _copy_to_table
 
   for my $row (@data) {
     map {
-      s/"/\\"/g;
+      s/(["\\])/\\$1/g;
       $_ = qq("$_") if /,/;
     } @$row;
 
