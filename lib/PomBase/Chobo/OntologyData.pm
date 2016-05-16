@@ -144,7 +144,13 @@ sub add
     my $term_namespace = $term->namespace();
 
     if (defined $term_namespace) {
-      $terms_by_cv_name->{$term_namespace}->{$name} = $term;
+      if (exists $terms_by_cv_name->{$term_namespace}->{$name}) {
+        warn qq(more than one Term with the name "$name" in namespace "$term_namespace" -\n) .
+          "existing:\n" . $term->to_string() . "\n\nand:\n" .
+          $terms_by_cv_name->{$term_namespace}->{$name}->to_string() . "\n";
+      } else {
+        $terms_by_cv_name->{$term_namespace}->{$name} = $term;
+      }
 
       if ($term->{is_relationshiptype}) {
         $relationship_terms_by_cv_name->{$term_namespace}->{$name} = $term;
