@@ -63,6 +63,7 @@ my $chobo = PomBase::Chobo->new(dbh => $dbh, ontology_data => $ontology_data);
 
 try {
   for my $filename (@filenames) {
+    warn "reading: $filename\n";
     $chobo->read_obo(filename => $filename);
   }
   $ontology_data->finish();
