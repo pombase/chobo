@@ -144,7 +144,8 @@ sub add
     my $term_namespace = $term->namespace();
 
     if (defined $term_namespace) {
-      if (exists $terms_by_cv_name->{$term_namespace}->{$name}) {
+      my $existing_term_by_name = $terms_by_cv_name->{$term_namespace}->{$name};
+      if ($existing_term_by_name && $existing_term_by_name != $term) {
         warn qq(more than one Term with the name "$name" in namespace "$term_namespace" -\n) .
           "existing:\n" . $term->to_string() . "\n\nand:\n" .
           $terms_by_cv_name->{$term_namespace}->{$name}->to_string() . "\n\n";
