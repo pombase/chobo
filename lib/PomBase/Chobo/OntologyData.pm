@@ -147,7 +147,7 @@ sub add
       if (exists $terms_by_cv_name->{$term_namespace}->{$name}) {
         warn qq(more than one Term with the name "$name" in namespace "$term_namespace" -\n) .
           "existing:\n" . $term->to_string() . "\n\nand:\n" .
-          $terms_by_cv_name->{$term_namespace}->{$name}->to_string() . "\n";
+          $terms_by_cv_name->{$term_namespace}->{$name}->to_string() . "\n\n";
       } else {
         $terms_by_cv_name->{$term_namespace}->{$name} = $term;
       }
