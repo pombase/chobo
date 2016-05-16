@@ -63,11 +63,16 @@ sub _copy_to_table
 
   my $column_names = join ',', @column_names;
 
-  $dbh->do("COPY $table_name($column_names) FROM STDIN")
+  $dbh->do("COPY $table_name($column_names) FROM STDIN CSV")
     or die "failed to COPY into $table_name: ", $dbh->errstr, "\n";
 
   for my $row (@data) {
-    if (!$dbh->pg_putcopydata((join "\t", @$row) . "\n")) {
+    map {
+      s/"/\\"/g;
+      $_ = qq("$_") if /,/;
+    } @$row;
+
+    if (!$dbh->pg_putcopydata((join ",", @$row) . "\n")) {
       die $dbh->errstr();
     }
   }
@@ -90,6 +95,7 @@ sub _get_relationship_terms
   } @cvterm_data;
 
   my %terms_by_name = ();
+  my %terms_by_termid = ();
 
   map {
     if (exists $terms_by_name{$_->name()}) {
@@ -98,10 +104,11 @@ sub _get_relationship_terms
         'using: ' . $terms_by_name{$_->name()}->id(), "\n";
     } else {
       $terms_by_name{$_->name()} = $_;
+      $terms_by_termid{$_->id()} = $_;
     }
   } @rel_terms;
 
-  return %terms_by_name;
+  return (\%terms_by_name, \%terms_by_termid);
 }
 
 
@@ -160,22 +167,36 @@ my %row_makers = (
     my $ontology_data = shift;
     my $chado_data = shift;
 
-    my %rel_cvterms_hash = _get_relationship_terms($chado_data);
+    my ($terms_by_name, $terms_by_termid) = _get_relationship_terms($chado_data);
 
     map {
-      my ($subject_termid, $rel_name, $object_termid) = @$_;
+      my ($subject_termid, $rel_name_or_id, $object_termid) = @$_;
 
-      warn "$subject_termid $rel_name $object_termid\n";
-      my $subject_id = $chado_data->get_cvterm_by_termid($subject_termid)->cvterm_id();
-      my $rel_id = $rel_cvterms_hash{$rel_name}->cvterm_id();
+      my $subject_term = $chado_data->get_cvterm_by_termid($subject_termid);
+      if (defined $subject_term) {
+        my $subject_id = $subject_term->{cvterm_id};
+        my $rel_term = $terms_by_name->{$rel_name_or_id} ||
+          $terms_by_termid->{$rel_name_or_id};
+        if (!defined $rel_term) {
+          die "can't find relation term $rel_name_or_id for relation:\n" .
+            "  $subject_termid <-$rel_name_or_id-> $object_termid\n";
+        }
 
-      if (!defined $rel_id) {
-        die "can't find cvterm for $rel_name\n";
+        my $rel_id = $rel_term->cvterm_id();
+
+        my $object_term = $chado_data->get_cvterm_by_termid($object_termid);
+        if (defined $object_term) {
+          my $object_id = $object_term->{cvterm_id};
+
+          [$subject_id, $rel_id, $object_id]
+        } else {
+          warn "no Chado cvterm for $object_termid - ignoring relation\n";
+          ();
+        }
+      } else {
+        warn "no Chado cvterm for $subject_termid - ignoring relation\n";
+        ();
       }
-
-      my $object_id = $chado_data->get_cvterm_by_termid($object_termid)->cvterm_id();
-
-      [$subject_id, $rel_id, $object_id]
     } $ontology_data->relationships();
   },
 );
