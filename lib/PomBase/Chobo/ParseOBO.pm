@@ -196,9 +196,10 @@ sub parse
 
           if ($interesting_metadata{$key}) {
             if (defined $metadata{$key}) {
-              fatal qq(metadata key "$key" occurs more than once in header);
+              warn qq(metadata key "$key" occurs more than once in header\n);
+            } else {
+              $metadata{$key} = $value;
             }
-            $metadata{$key} = $value;
           }
         } else {
           fatal "can't parse header line: $line";
