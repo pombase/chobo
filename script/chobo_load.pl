@@ -57,12 +57,15 @@ my $dbh = DBI->connect($connect_str, $user, $pass,
                        { AutoCommit => 0, PrintError => 0 })
   or die "Cannot connect using $: $DBI::errstr\n";
 
-my $chobo = PomBase::Chobo->new(dbh => $dbh);
+my $ontology_data = PomBase::Chobo::OntologyData->new();
+
+my $chobo = PomBase::Chobo->new(dbh => $dbh, ontology_data => $ontology_data);
 
 try {
   for my $filename (@filenames) {
     $chobo->read_obo(filename => $filename);
   }
+  $ontology_data->finish();
   $chobo->chado_store();
   warn "commiting\n";
   $dbh->commit() or die $dbh->errstr;

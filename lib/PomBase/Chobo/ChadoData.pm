@@ -305,6 +305,13 @@ sub get_all_termids
   return keys %{$self->dbxref_data()->{by_termid}};
 }
 
+sub get_all_cvterms
+{
+  my $self = shift;
+
+  return values %{$self->cvterm_data()->{by_termid}};
+}
+
 sub get_dbxref_by_dbxref_id
 {
   my $self = shift;

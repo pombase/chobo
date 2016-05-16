@@ -79,20 +79,29 @@ sub _copy_to_table
   warn "COPY $table_name FROM STDIN finished\n";
 }
 
-sub _get_relationship_term
+sub _get_relationship_terms
 {
-  my $self = shift;
   my $chado_data = shift;
-  my $rel_name = shift;
-  my $rel_cv_names_ref = shift;
 
-  my @rel_cv_names = @$rel_cv_names_ref;
+  my @cvterm_data = $chado_data->get_all_cvterms();
 
-  for my $rel_cv_name (@rel_cv_names) {
-    my $cv_id = $chado_data->get_cv_by_name($rel_cv_name)->{cv_id};
+  my @rel_terms = grep {
+    $_->is_relationshiptype();
+  } @cvterm_data;
 
-    my $get_cvterm_by_cv_i
-  }
+  my %terms_by_name = ();
+
+  map {
+    if (exists $terms_by_name{$_->name()}) {
+      warn 'two relationship terms with the same name ("' .
+        $_->id() . '" and "' . $terms_by_name{$_->name()}->id() . '") - ' .
+        'using: ' . $terms_by_name{$_->name()}->id(), "\n";
+    } else {
+      $terms_by_name{$_->name()} = $_;
+    }
+  } @rel_terms;
+
+  return %terms_by_name;
 }
 
 
@@ -132,50 +141,43 @@ my %row_makers = (
     my $chado_data = shift;
 
     map {
-      my $cv_name = $_;
-      my $cv_id = $chado_data->get_cv_by_name($cv_name)->{cv_id};
+      my $term = $_;
 
-      my @cvterms = $ontology_data->get_terms_by_cv_name($cv_name);
+      my $cv = $chado_data->get_cv_by_name($term->{namespace});
+      my $cv_id = $cv->{cv_id};
 
-      map {
-        my $term = $_;
+      my $dbxref_id = $chado_data->get_dbxref_by_termid($term->{id})->{dbxref_id};
+      my $is_relationshiptype = $term->{is_relationshiptype};
 
-        my $dbxref_id = $chado_data->get_dbxref_by_termid($term->{id})->{dbxref_id};
-        my $is_relationshiptype = $term->{is_relationshiptype};
-
-        if ($term->{is_obsolete}) {
-          ();
-        } else {
-          [$term->name(), $cv_id, $dbxref_id, $is_relationshiptype];
-        }
-      } @cvterms;
-    } $ontology_data->get_cv_names();
+      if ($term->{is_obsolete}) {
+        ();
+      } else {
+        [$term->name(), $cv_id, $dbxref_id, $is_relationshiptype];
+      }
+    } $ontology_data->get_terms();
   },
-#   cvterm_relationship = sub {
-#     my $ontology_data = shift;
-#     my $chado_data = shift;
-#
-#     my $is_a_cvterm = $self->_get_relationship_term($chado_data, 'is_a',
-#                                                     [@relationship_cv_names]);
-#
-#     map {
-#       my $cv_name = $_;
-#       my $cv_id = $chado_data->get_cv_by_name($cv_name)->{cv_id};
-#
-#       my @cvterms = $ontology_data->get_terms_by_cv_name($cv_name);
-#
-#       map {
-#         my $term = $_;
-#
-# #        if (
-#
-#         my $subject_id = $chado_data->get_cvterm_by_termid($term->{id});
-#         my $rel_name = $
-#
-#         [$term->name(), $cv_id, $dbxref_id, $is_relationshiptype];
-#       } @cvterms;
-#     } $ontology_data->get_cv_names();
-#   },
+  cvterm_relationship => sub {
+    my $ontology_data = shift;
+    my $chado_data = shift;
+
+    my %rel_cvterms_hash = _get_relationship_terms($chado_data);
+
+    map {
+      my ($subject_termid, $rel_name, $object_termid) = @$_;
+
+      warn "$subject_termid $rel_name $object_termid\n";
+      my $subject_id = $chado_data->get_cvterm_by_termid($subject_termid)->cvterm_id();
+      my $rel_id = $rel_cvterms_hash{$rel_name}->cvterm_id();
+
+      if (!defined $rel_id) {
+        die "can't find cvterm for $rel_name\n";
+      }
+
+      my $object_id = $chado_data->get_cvterm_by_termid($object_termid)->cvterm_id();
+
+      [$subject_id, $rel_id, $object_id]
+    } $ontology_data->relationships();
+  },
 );
 
 my %table_column_names = (
@@ -195,7 +197,7 @@ sub chado_store
 
   my $chado_data = $self->chado_data();
 
-  my @tables_to_store = qw(db dbxref cv cvterm);
+  my @tables_to_store = qw(db dbxref cv cvterm cvterm_relationship);
 
   for my $table_to_store (@tables_to_store) {
     my @rows = $row_makers{$table_to_store}->($self->ontology_data(),

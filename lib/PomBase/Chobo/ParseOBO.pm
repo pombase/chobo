@@ -63,17 +63,15 @@ sub _finish_stanza
     return;
   }
 
-  if (!defined $current->{namespace}) {
-    $current->{namespace} =
-      $metadata_ref->{'default-namespace'};
-
-    # the namespace may be undef, temporarily - hopefully it will merge with a
-    # term/stanza that has a namespace before we use it
-  }
-
   $current->{metadata} = $metadata_ref;
   $current->{source_file} = $filename;
   $current->{relationship} //= [];
+
+  if (!defined $current->{namespace}) {
+    $current->{namespace} =
+      $metadata_ref->{'default-namespace'} //
+      $current->{source_file};
+  }
 
   if ($current->{is_a}) {
     map {

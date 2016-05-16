@@ -59,7 +59,7 @@ has terms_by_db_name => (is => 'rw', init_arg => undef, isa => 'HashRef',
                          default => sub { {} });
 has metadata_by_namespace => (is => 'rw', init_arg => undef, isa => 'HashRef',
                               default => sub { {} });
-has term_relationships => (is => 'rw', init_arg => undef, isa => 'HashRef',
+has _term_relationships => (is => 'rw', init_arg => undef, isa => 'HashRef',
                            default => sub { {} });
 
 =head2 add
@@ -159,7 +159,7 @@ sub add
       for my $rel (@{$term->{relationship}}) {
         my $key = $term->{id} . '<' . $rel->{relationship_name} .
           '>' . $rel->{other_term};
-        $self->term_relationships()->{$key} = 1;
+        $self->_term_relationships()->{$key} = 1;
       }
     }
   }
@@ -237,14 +237,38 @@ sub relationships
 {
   my $self = shift;
 
-  return map {
+  if ($self->{_relationships}) {
+    return @{$self->{_relationships}}
+  }
+
+  $self->{_relationships} = [map {
     my ($subject_id, $rel_name, $object_id) = /(.*)<(.*)>(.*)/;
-    {
-      subject_id => $subject_id,
-      rel_name => $rel_name,
-      object_id => $object_id,
+
+    my $object_term = $self->get_term_by_id($object_id);
+
+    if (!$object_term) {
+      my $subject_term = $self->get_term_by_id($subject_id);
+      warn qq(ignoring relation where object isn't defined: "$object_id" line ) .
+        $subject_term->{source_file_line_number} . ' of ' .
+        $subject_term->{source_file} . "\n";
+      ();
+    } else {
+      [$subject_id, $rel_name, $object_id];
     }
-  } keys %{$self->term_relationships()};
+  } sort keys %{$self->_term_relationships()}];
+
+  return @{$self->{_relationships}};
+}
+
+sub finish
+{
+  my $self = shift;
+
+  my @relationships = $self->relationships();
+
+  if (@relationships == 0) {
+    warn "note: no relationships read\n";
+  }
 }
 
 1;
