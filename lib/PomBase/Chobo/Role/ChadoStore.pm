@@ -104,6 +104,7 @@ sub _get_relationship_terms
         'using: ' . $terms_by_name{$_->name()}->id(), "\n";
     } else {
       $terms_by_name{$_->name()} = $_;
+      $terms_by_name{$_->name() =~ s/\s+/_/gr} = $_;
       $terms_by_termid{$_->id()} = $_;
     }
   } @rel_terms;
