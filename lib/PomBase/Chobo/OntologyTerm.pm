@@ -155,8 +155,10 @@ sub merge
           my $new_field_value = $other_term->{$name};
 
           if (defined $new_field_value) {
-            if (defined $self->{$name}) {
-              if ($self->{$name} ne $new_field_value) {
+            if (defined $self->{$name} &&
+                ($name ne 'namespace' || $self->{$name} !~ /::/)) {
+              if ($self->{$name} ne $new_field_value &&
+                  ($name ne 'namespace' || $new_field_value !~ /::/)) {
                 warn qq|new "$name" tag of this stanza (from |,
                   $other_term->source_file(), " line ",
                   $other_term->source_file_line_number(), ") ",

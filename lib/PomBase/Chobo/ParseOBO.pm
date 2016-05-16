@@ -68,9 +68,12 @@ sub _finish_stanza
   $current->{relationship} //= [];
 
   if (!defined $current->{namespace}) {
+    my $db_name = $current->{id};
+    $db_name =~ s/:.*//;
+
     $current->{namespace} =
       $metadata_ref->{'default-namespace'} //
-      $current->{source_file};
+      $current->{source_file} . '::' . $db_name;
   }
 
   if ($current->{is_a}) {
