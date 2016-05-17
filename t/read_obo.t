@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 16;
+use Test::More tests => 18;
 use Test::Deep;
 
 use PomBase::Chobo::ParseOBO;
@@ -76,3 +76,22 @@ $parser->parse(filename => 't/data/single_term.obo',
                ontology_data => $single_term_ontology_data);
 
 is ($single_term_ontology_data->get_terms(), 1);
+
+
+my $dodgy_term_ontology_data = PomBase::Chobo::OntologyData->new();
+
+# check term with double quote in the name
+$parser->parse(filename => 't/data/mini_go.obo',
+               ontology_data => $dodgy_term_ontology_data);
+
+is ($dodgy_term_ontology_data->get_terms(), 2);
+
+my @dodgy_terms = sort map {
+  $_->{name}
+} $dodgy_term_ontology_data->get_terms();
+
+cmp_deeply(\@dodgy_terms,
+           [
+             'cyanidin 3-O-glucoside-(2"-O-xyloside) 6\'\'-O-acyltransferase activity',
+             'molecular_function'
+           ]);
