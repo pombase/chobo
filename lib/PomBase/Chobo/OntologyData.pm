@@ -115,6 +115,16 @@ sub add
     } else {
       if (@found_existing_terms == 1) {
         my $existing_term = $found_existing_terms[0];
+
+        my $old_namespace = $existing_term->namespace();
+
+        if ($old_namespace ne $term->namespace() &&
+            $old_namespace =~ /::/) {
+          # "::" in a namespace means a temporary namespace was used,
+          # like "/data/cl.obo::CHEBI" - hopefully it will be fixed on merge
+          delete $self->terms_by_cv_name()->{$old_namespace}->{$existing_term->name()};
+        }
+
         $existing_term->merge($term);
         $term = $existing_term;
       }
