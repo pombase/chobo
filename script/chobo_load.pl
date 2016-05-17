@@ -3,6 +3,7 @@
 use Mouse;
 use Try::Tiny;
 
+use Getopt::Long qw(:config pass_through);
 use lib qw(lib);
 
 use DBI;
@@ -19,31 +20,26 @@ sub usage
 
   die <<"USAGE";
 usage:
-$0 [-P|-p] connect_string username password filename(s)
+  $0 [-d] connect_string username password filename(s)
+or:
+  $0 -h
 
-  -c  As well as loading the ontologies into the cvterm table, run
-      owltools to get the inferred relations / transitive closure
-      and then load that into the cvtermpath table.
-  -C  Don't load the ontologies, just populate the cvtermpath table from
-      OBO files.  If there are terms in the OBO file that aren't in the
-      cvterm table, this will fail.
+  -d  Dry run - rollback at the end of loading
+  -h  Show this help message
+
 USAGE
 }
 
-my $load_terms = 1;
-my $load_closure = 0;
+my $dry_run = 0;
+my $do_help = 0;
 
-if (@ARGV && $ARGV[0] =~ /^-/) {
-  if ($ARGV[0] eq '-c') {
-    $load_closure = 1;
-  } else {
-    if ($ARGV[0] eq '-C') {
-      $load_closure = 1;
-      $load_terms = 0;
-    } else {
-      usage "unknown option: $ARGV[0]";
-    }
-  }
+if (!GetOptions("dry-run|d" => \$dry_run,
+                "help|h" => \$do_help)) {
+  usage();
+}
+
+if ($do_help) {
+  usage();
 }
 
 if (@ARGV < 4) {
@@ -68,8 +64,13 @@ try {
   }
   $ontology_data->finish();
   $chobo->chado_store();
-  warn "commiting\n";
-  $dbh->commit() or die $dbh->errstr;
+  if ($dry_run) {
+    warn "dry run - rolling back\n";
+    $dbh->rollback();
+  } else {
+    warn "commiting\n";
+    $dbh->commit() or die $dbh->errstr;
+  }
 } catch {
   warn "failed - rolling back: $_\n";
   $dbh->rollback() or die $dbh->errstr;
