@@ -176,10 +176,10 @@ sub _get_by_copy
 
   my $column_names = join ',', @column_names;
 
-  $dbh->do("COPY $table_name($column_names) TO STDOUT")
+  $dbh->do("COPY $table_name($column_names) TO STDOUT CSV")
     or die "failed to COPY $table_name: ", $dbh->errstr, "\n";
 
-  my $tsv = Text::CSV->new({sep_char => "\t"});
+  my $tsv = Text::CSV->new({sep_char => ","});
 
   my $line = undef;
 
@@ -189,7 +189,7 @@ sub _get_by_copy
       my @fields = $tsv->fields();
       $proc->(\@fields);
     } else {
-      die "couldn't parse this line as tab separated values: $line\n";
+      die "couldn't parse this line: $line\n";
     }
   }
 }
