@@ -154,7 +154,13 @@ my %row_makers = (
       my $cv = $chado_data->get_cv_by_name($term->{namespace});
       my $cv_id = $cv->{cv_id};
 
-      my $dbxref_id = $chado_data->get_dbxref_by_termid($term->{id})->{dbxref_id};
+      my $dbxref = $chado_data->get_dbxref_by_termid($term->id());
+
+      if (!$dbxref) {
+        die "dbxref not found for:\n", $term->to_string(), "\n";
+      }
+
+      my $dbxref_id = $dbxref->{dbxref_id};
       my $is_relationshiptype = $term->{is_relationshiptype};
 
       if ($term->{is_obsolete}) {
