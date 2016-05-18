@@ -92,9 +92,9 @@ our %field_conf = (
   part_of => {
     type => 'ARRAY',
   },
-  xref => {
-    type => 'ARRAY',
-  },
+#  xref => {
+#    type => 'ARRAY',
+#  },
   relationship => {
     type => 'ARRAY',
     process => sub {
