@@ -277,6 +277,14 @@ sub relationships
   return @{$self->{_relationships}};
 }
 
+=head2 finish
+
+ Usage   : $self->finish();
+ Function: remove namespaces that are empty due to merging and check that
+           objects and subjects of relationships exist
+
+=cut
+
 sub finish
 {
   my $self = shift;
@@ -286,6 +294,20 @@ sub finish
   if (@relationships == 0) {
     warn "note: no relationships read\n";
   }
+
+  # find and remove namespaces that are empty due to merging
+  my @empty_namespaces =
+    map {
+      if (scalar(keys %{$self->terms_by_cv_name()->{$_}}) == 0) {
+        $_;
+      } else {
+        ();
+      }
+    } keys %{$self->terms_by_cv_name()};
+
+  map {
+    delete $self->terms_by_cv_name()->{$_};
+  } @empty_namespaces;
 }
 
 1;
