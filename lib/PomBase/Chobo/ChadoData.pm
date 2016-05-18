@@ -362,7 +362,13 @@ sub _build_dbxref_data
     if (!defined $db_name) {
       die "no db name for db $db_id";
     }
-    my $termid = "$db_name:$accession";
+    my $termid;
+
+    if ($db_name eq '_global') {
+      $termid = $accession;
+    } else {
+      $termid = "$db_name:$accession";
+    }
 
     $by_dbxref_id{$dbxref_id} = \%data;
     $by_termid{$termid} = \%data;

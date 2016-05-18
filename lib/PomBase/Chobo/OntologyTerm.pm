@@ -76,9 +76,18 @@ sub make_object
 {
   my $class = shift;
   my $object = shift;
+  my $options = shift;
 
   if (!defined $object) {
     croak "no argument passed to new()";
+  }
+
+  $object->{_namespace_from_metadata} = 0;
+
+  if ($options) {
+    if ($options->{namespace_from_metadata}) {
+      $object->{_namespace_from_metadata} = 1;
+    }
   }
 
   $object->{alt_id} //= [];
@@ -86,11 +95,8 @@ sub make_object
   my ($db_name, $accession);
 
   unless (($db_name, $accession) = $object->{id} =~ /^(\S+):(.+?)\s*$/) {
-    $db_name = $object->{namespace} //
-      $object->{ontology} // $object->{source_file};
+    $db_name = '_global';
     $accession = $object->{id};
-
-    $object->{id} = "$db_name:$accession";
   }
 
   $object->{accession} = $accession;
@@ -155,10 +161,12 @@ sub merge
           my $new_field_value = $other_term->{$name};
 
           if (defined $new_field_value) {
-            if (defined $self->{$name} &&
-                ($name ne 'namespace' || $self->{$name} !~ /::/)) {
-              if ($self->{$name} ne $new_field_value &&
-                  ($name ne 'namespace' || $new_field_value !~ /::/)) {
+            if (!defined $self->{$name} ||
+                ($name eq 'namespace' &&
+                 $self->{_namespace_from_metadata})) {
+              $self->{$name} = $new_field_value;
+            } else {
+              if ($name ne 'namespace' || !$other_term->{_namespace_from_metadata}) {
                 warn qq|new "$name" tag of this stanza (from |,
                   $other_term->source_file(), " line ",
                   $other_term->source_file_line_number(), ") ",
@@ -171,8 +179,6 @@ sub merge
                   "into existing term:\n",
                   $self->to_string(), "\n\n";
               }
-            } else {
-              $self->{$name} = $new_field_value;
             }
           } else {
             # no merging to do

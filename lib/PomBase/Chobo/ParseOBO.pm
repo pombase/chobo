@@ -66,13 +66,18 @@ sub _finish_stanza
   $current->{source_file} = $filename;
   $current->{relationship} //= [];
 
+  my $namespace_from_metadata = 0;
+
   if (!defined $current->{namespace}) {
     my $db_name = $current->{id};
     $db_name =~ s/:.*//;
 
     $current->{namespace} =
       $metadata_ref->{'default-namespace'} //
+      $metadata_ref->{'ontology'} //
       $current->{source_file} . '::' . $db_name;
+
+    $namespace_from_metadata = 1;
   }
 
   if ($current->{is_a}) {
@@ -87,8 +92,11 @@ sub _finish_stanza
     delete $current->{is_a};
   }
 
+  my $options = { namespace_from_metadata => $namespace_from_metadata };
 
-  push @$terms_ref, PomBase::Chobo::OntologyTerm->make_object($current);
+  my $new_term = PomBase::Chobo::OntologyTerm->make_object($current, $options);
+
+  push @$terms_ref, $new_term;
 }
 
 sub fatal
