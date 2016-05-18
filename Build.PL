@@ -14,6 +14,7 @@ my $builder = Module::Build->new(
     requires => {
         'perl' => 5.006,
         'Text::CSV_XS' => 0,
+        'Text::CSV::Encoded' => 0,
         'DBI' => 0,
         'DBD::Pg' => 0,
         'Clone' => 0,

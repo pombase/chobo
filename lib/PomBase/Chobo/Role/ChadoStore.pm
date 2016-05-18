@@ -36,6 +36,7 @@ under the same terms as Perl itself.
 =cut
 
 use Mouse::Role;
+use Text::CSV::Encoded
 
 requires 'dbh';
 requires 'chado_data';
@@ -66,13 +67,12 @@ sub _copy_to_table
   $dbh->do("COPY $table_name($column_names) FROM STDIN CSV")
     or die "failed to COPY into $table_name: ", $dbh->errstr, "\n";
 
-  for my $row (@data) {
-    map {
-      s/(["\\])/\\$1/g;
-      $_ = qq("$_") if /,/;
-    } @$row;
+  my $csv = Text::CSV::Encoded->new({ encoding  => "utf8" });
 
-    if (!$dbh->pg_putcopydata((join ",", @$row) . "\n")) {
+  for my $row (@data) {
+    $csv->combine(@$row);
+
+    if (!$dbh->pg_putcopydata($csv->string() . "\n")) {
       die $dbh->errstr();
     }
   }
