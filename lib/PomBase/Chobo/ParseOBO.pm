@@ -69,7 +69,8 @@ sub _finish_stanza
   my $namespace_from_metadata = 0;
 
   if (!defined $current->{namespace}) {
-    if ($metadata_ref->{'ontology'} eq 'ro') {
+    if (defined $metadata_ref->{'ontology'} &&
+        $metadata_ref->{'ontology'} eq 'ro') {
       $current->{namespace} = 'relationship';
     } else {
       $current->{namespace} =
