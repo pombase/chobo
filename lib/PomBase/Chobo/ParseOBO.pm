@@ -69,13 +69,14 @@ sub _finish_stanza
   my $namespace_from_metadata = 0;
 
   if (!defined $current->{namespace}) {
-    my $db_name = $current->{id};
-    $db_name =~ s/:.*//;
-
-    $current->{namespace} =
-      $metadata_ref->{'default-namespace'} //
-      $metadata_ref->{'ontology'} //
-      $current->{source_file} . '::' . $db_name;
+    if ($metadata_ref->{'ontology'} eq 'ro') {
+      $current->{namespace} = 'relationship';
+    } else {
+      $current->{namespace} =
+        $metadata_ref->{'default-namespace'} //
+        $metadata_ref->{'ontology'} //
+        $current->{source_file} . '::' . $current->{id} =~ s/:.*//r;
+    }
 
     $namespace_from_metadata = 1;
   }
