@@ -164,9 +164,6 @@ my %row_makers = (
       my $dbxref_id = $dbxref->{dbxref_id};
       my $is_relationshiptype = $term->{is_relationshiptype};
       my $is_obsolete = $term->{is_obsolete} ? 1 : 0;
-      if ($is_obsolete) {
-        $name .= ' (obsolete ' . $term->id() . ')'
-      }
 
       [$name, $cv_id, $dbxref_id, $is_relationshiptype, $is_obsolete];
     } $ontology_data->get_terms();
