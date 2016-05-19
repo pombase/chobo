@@ -82,6 +82,10 @@ sub make_object
     croak "no argument passed to new()";
   }
 
+  if ($object->{is_relationshiptype}) {
+    $object->{name} =~ s/ /_/g;
+  }
+
   $object->{_namespace_from_metadata} = 0;
 
   if ($options) {
