@@ -62,8 +62,9 @@ try {
     warn "reading: $filename\n";
     $chobo->read_obo(filename => $filename);
   }
-  $ontology_data->finish();
+
   $chobo->chado_store();
+
   if ($dry_run) {
     warn "dry run - rolling back\n";
     $dbh->rollback();

@@ -218,6 +218,8 @@ sub chado_store
 {
   my $self = shift;
 
+  $self->ontology_data()->finish();
+
   my @cvterm_column_names =
     @PomBase::Chobo::ChadoData::cvterm_column_names;
 
