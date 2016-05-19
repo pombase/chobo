@@ -160,14 +160,15 @@ my %row_makers = (
         die "dbxref not found for:\n", $term->to_string(), "\n";
       }
 
+      my $name = $term->name();
       my $dbxref_id = $dbxref->{dbxref_id};
       my $is_relationshiptype = $term->{is_relationshiptype};
-
-      if ($term->{is_obsolete}) {
-        ();
-      } else {
-        [$term->name(), $cv_id, $dbxref_id, $is_relationshiptype];
+      my $is_obsolete = $term->{is_obsolete} ? 1 : 0;
+      if ($is_obsolete) {
+        $name .= ' (obsolete ' . $term->id() . ')'
       }
+
+      [$name, $cv_id, $dbxref_id, $is_relationshiptype, $is_obsolete];
     } $ontology_data->get_terms();
   },
   cvterm_relationship => sub {
@@ -212,7 +213,7 @@ my %table_column_names = (
   db => [qw(name)],
   dbxref => [qw(db_id accession)],
   cv => [qw(name)],
-  cvterm => [qw(name cv_id dbxref_id is_relationshiptype)],
+  cvterm => [qw(name cv_id dbxref_id is_relationshiptype is_obsolete)],
   cvterm_relationship => [qw(subject_id type_id object_id)],
 );
 
