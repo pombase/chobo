@@ -25,3 +25,4 @@ def: "Catalysis of the reaction: cyanidin 3-O-beta-D-sambubioside +4-coumaryl-Co
 xref: MetaCyc:RXN-15329
 is_a: GO:0003674
 synonym: "cyanidin 3-O-glucoside-yadda-yadda" EXACT []
+synonym: "cyanidin 3-O-glucoside-something" NARROW []
