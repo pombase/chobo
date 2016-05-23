@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 6;
+use Test::More tests => 9;
 use Test::Deep;
 
 use lib qw(t/lib);
@@ -39,7 +39,21 @@ cmp_deeply([
 my $sth = $fake_handle->prepare("select cvterm_id, name, cv_id from cvterm order by name");
 $sth->execute();
 
-is($sth->fetchrow_hashref()->{name}, $cyanidin_name);
-is($sth->fetchrow_hashref()->{name}, 'is_a');
-is($sth->fetchrow_hashref()->{name}, 'molecular_function');
+my $cyanidin_term = $sth->fetchrow_hashref();
+is ($cyanidin_term->{name}, $cyanidin_name);
+my $is_a_term = $sth->fetchrow_hashref();
+is ($is_a_term->{name}, 'is_a');
+my $molecular_function_term = $sth->fetchrow_hashref();
+is ($molecular_function_term->{name}, 'molecular_function');
+
+
+$sth = $fake_handle->prepare("select subject_id, type_id, object_id from cvterm_relationship order by subject_id");
+$sth->execute();
+
+my $rel = $sth->fetchrow_hashref();
+
+is ($rel->{subject_id}, $cyanidin_term->{cvterm_id});
+is ($rel->{type_id}, $is_a_term->{cvterm_id});
+is ($rel->{object_id}, $molecular_function_term->{cvterm_id});
+
 
