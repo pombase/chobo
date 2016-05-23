@@ -48,7 +48,7 @@ has dbxref_data => (is => 'ro', init_arg => undef, lazy_build => 1);
 has cvtermsynonyms_by_cvterm_id => (is => 'rw', init_arg => undef, lazy_build => 1);
 
 our @cvterm_column_names = qw(cvterm_id name cv_id dbxref_id is_obsolete is_relationshiptype);
-our @dbxref_column_names = qw(dbxref_id db_id accession version);
+our @dbxref_column_names = qw(dbxref_id db_id accession);
 
 sub _execute
 {

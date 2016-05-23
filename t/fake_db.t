@@ -12,6 +12,7 @@ my $fake_dbh = ChoboTest::FakeHandle->new();
 
 
 my $sth = $fake_dbh->prepare("select cvterm_id, name, cv_id from cvterm");
+$sth->execute();
 is ($sth->query_table_name(), 'cvterm');
 
 my $row_1 = $sth->fetchrow_hashref();
@@ -51,8 +52,8 @@ my @expected_dbxrefs = (
   { dbxref_id => 202, accession => 'test_dbref_2', db_id => 101 }
 );
 
-cmp_deeply(\@expected_dbxrefs,
-           [$sth->fetchrow_hashref(), $sth->fetchrow_hashref(), $sth->fetchrow_hashref()]);
+cmp_deeply([$sth->fetchrow_hashref(), $sth->fetchrow_hashref(), $sth->fetchrow_hashref()],
+           \@expected_dbxrefs);
 my $end_row = $sth->fetchrow_hashref();
 is($end_row, undef);
 
@@ -75,4 +76,4 @@ while ($fake_dbh->pg_getcopydata(\$line) > 0) {
   }
 }
 
-cmp_deeply(\@expected_dbxrefs, \@copy_ret_rows);
+cmp_deeply(\@copy_ret_rows, \@expected_dbxrefs);

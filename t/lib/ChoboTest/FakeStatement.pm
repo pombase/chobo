@@ -3,6 +3,8 @@ package ChoboTest::FakeStatement;
 use Mouse;
 
 use Clone qw(clone);
+use Text::CSV;
+use Text::CSV::Encoded;
 
 has statement => (is => 'rw', required => 1);
 has storage => (is => 'rw', required => 1, isa => 'HashRef');
@@ -85,7 +87,15 @@ sub pg_putcopydata
   my $row_data = shift;
   chomp $row_data;
 
-  my @parsed_row_data = split /,/, $row_data;
+  my @parsed_row_data;
+
+  my $csv = Text::CSV->new({sep_char => ","});
+
+  if ($csv->parse($row_data)) {
+    @parsed_row_data = $csv->fields();
+  } else {
+    die "couldn't parse this line: $row_data";
+  }
 
   my @insert_row = ();
 
@@ -128,7 +138,10 @@ sub pg_getcopydata
     push @ret_col_values, $row_data->{$ret_col_name};
   }
 
-  $$line_ref = (join ',', @ret_col_values) . "\n";
+  my $csv = Text::CSV::Encoded->new({ encoding  => "utf8" });
+  $csv->combine(@ret_col_values);
+
+  $$line_ref = $csv->string();
 
   return length $$line_ref;
 }
