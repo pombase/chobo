@@ -91,7 +91,14 @@ sub pg_putcopydata
 {
   my $self = shift;
 
-  $self->current_sth()->pg_putcopydata(@_);
+  return $self->current_sth()->pg_putcopydata(@_);
+}
+
+sub pg_getcopydata
+{
+  my $self = shift;
+
+  return $self->current_sth()->pg_getcopydata(@_);
 }
 
 sub pg_putcopyend
@@ -99,6 +106,13 @@ sub pg_putcopyend
   my $self = shift;
 
   $self->current_sth(undef);
+
+  return 1;
+}
+
+sub errstr
+{
+  return '';
 }
 
 sub prepare

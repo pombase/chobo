@@ -1,7 +1,8 @@
 use strict;
 use warnings;
-use Test::More tests => 12;
+use Test::More tests => 11;
 use Test::Deep;
+use Text::CSV;
 
 use lib qw(t/lib);
 
@@ -44,14 +45,34 @@ $fake_dbh->pg_putcopyend();
 $sth = $fake_dbh->prepare("select dbxref_id, accession, db_id from dbxref");
 is ($sth->query_table_name(), 'dbxref');
 
-$row_1 = $sth->fetchrow_hashref();
-cmp_deeply($row_1, { dbxref_id => 200, accession => 'is_a', db_id => 100 });
+my @expected_dbxrefs = (
+  { dbxref_id => 200, accession => 'is_a', db_id => 100 },
+  { dbxref_id => 201, accession => 'test_dbref_1', db_id => 101 },
+  { dbxref_id => 202, accession => 'test_dbref_2', db_id => 101 }
+);
 
-$row_2 = $sth->fetchrow_hashref();
-cmp_deeply($row_2, { dbxref_id => 201, accession => 'test_dbref_1', db_id => 101 });
+cmp_deeply(\@expected_dbxrefs,
+           [$sth->fetchrow_hashref(), $sth->fetchrow_hashref(), $sth->fetchrow_hashref()]);
+my $end_row = $sth->fetchrow_hashref();
+is($end_row, undef);
 
-my $row_3 = $sth->fetchrow_hashref();
-cmp_deeply($row_3, { dbxref_id => 202, accession => 'test_dbref_2', db_id => 101 });
 
-my $row_4 = $sth->fetchrow_hashref();
-is($row_4, undef);
+$fake_dbh->do("COPY dbxref(dbxref_id, accession, db_id) TO STDOUT CSV") or die;
+
+my @copy_ret_rows = ();
+my $tsv = Text::CSV->new({sep_char => ","});
+my $line = undef;
+
+while ($fake_dbh->pg_getcopydata(\$line) > 0) {
+  chomp $line;
+  if ($tsv->parse($line)) {
+    my @fields = $tsv->fields();
+    push @copy_ret_rows, {
+      dbxref_id => $fields[0],
+      accession => $fields[1],
+      db_id => $fields[2],
+    };
+  }
+}
+
+cmp_deeply(\@expected_dbxrefs, \@copy_ret_rows);

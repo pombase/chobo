@@ -23,7 +23,7 @@ sub BUILD
 
     $self->query_column_names(\@column_names);
   } else {
-    if ($statement =~ /copy\s+(.*?)\s*\((.+)\) FROM STDIN CSV/i) {
+    if ($statement =~ /copy\s+(.*?)\s*\((.+)\) (FROM STDIN|TO STDOUT) CSV/i) {
       $self->query_table_name($1);
 
       my @column_names = split /,\s*/, $2;
@@ -39,7 +39,7 @@ sub BUILD
 
 sub execute
 {
-
+  return 1;
 }
 
 sub _as_hashref
@@ -107,9 +107,34 @@ sub pg_putcopydata
   push @{$table_data->{rows}}, \@insert_row;
 }
 
+sub pg_getcopydata
+{
+  my $self = shift;
+  my $line_ref = shift;
+
+  my $storage = $self->storage();
+  my $table_data = $storage->{$self->query_table_name()};
+  my $query_table_name = $self->query_table_name();
+
+  my $row_data = $self->fetchrow_hashref();
+
+  if (!$row_data) {
+    return -1;
+  }
+
+  my @ret_col_values = ();
+
+  for my $ret_col_name (@{$self->query_column_names()}) {
+    push @ret_col_values, $row_data->{$ret_col_name};
+  }
+
+  $$line_ref = (join ',', @ret_col_values) . "\n";
+
+  return length $$line_ref;
+}
+
 sub finish
 {
-  warn "FINISH()";
 }
 
 1;
