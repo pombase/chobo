@@ -94,6 +94,22 @@ sub _finish_stanza
     delete $current->{is_a};
   }
 
+  if ($current->{synonym}) {
+    my %seen_synonyms = ();
+
+    $current->{synonym} = [
+      grep {
+        my $key = $_->{synonym} . '::::::' . $_->{scope};
+        if ($seen_synonyms{$key}) {
+          0;
+        } else {
+          $seen_synonyms{$key} = 1;
+          1;
+        }
+      } @{$current->{synonym}}
+    ];
+  }
+
   my $options = { namespace_from_metadata => $namespace_from_metadata };
 
   my $new_term = PomBase::Chobo::OntologyTerm->make_object($current, $options);
