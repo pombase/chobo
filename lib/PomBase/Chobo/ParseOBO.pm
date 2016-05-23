@@ -98,13 +98,13 @@ sub _finish_stanza
     my %seen_synonyms = ();
 
     $current->{synonym} = [
-      grep {
-        my $key = $_->{synonym} . '::::::' . $_->{scope};
-        if ($seen_synonyms{$key}) {
-          0;
+      map {
+
+        my $seen_synonym = $seen_synonyms{$_->{synonym}};
+        if ($seen_synonym && lc $seen_synonym->{scope} eq 'exact') {
+          # keep it
         } else {
-          $seen_synonyms{$key} = 1;
-          1;
+          $seen_synonyms{$_->{synonym}} = $_;
         }
       } @{$current->{synonym}}
     ];

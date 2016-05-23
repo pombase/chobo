@@ -26,4 +26,6 @@ xref: MetaCyc:RXN-15329
 is_a: GO:0003674
 synonym: "cyanidin 3-O-glucoside-yadda-yadda" EXACT []
 synonym: "cyanidin 3-O-glucoside-yadda-yadda" EXACT []
+synonym: "cyanidin 3-O-glucoside-yadda-yadda" NARROW []
+synonym: "cyanidin 3-O-glucoside-yadda-yadda" EXACT []
 synonym: "cyanidin 3-O-glucoside-something" NARROW []
