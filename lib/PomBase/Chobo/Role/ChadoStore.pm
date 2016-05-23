@@ -80,8 +80,6 @@ sub _copy_to_table
   if (!$dbh->pg_putcopyend()) {
     die $dbh->errstr();
   }
-
-  warn "COPY $table_name FROM STDIN finished\n";
 }
 
 sub _get_relationship_terms
