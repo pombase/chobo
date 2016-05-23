@@ -36,15 +36,10 @@ cmp_deeply([
 
 
 
-my $sth = $fake_handle->prepare("select cvterm_id, name, cv_id from cvterm");
+my $sth = $fake_handle->prepare("select cvterm_id, name, cv_id from cvterm order by name");
 $sth->execute();
 
-my $row_1 = $sth->fetchrow_hashref();
-is($row_1->{name}, 'is_a');
-
-my $row_2 = $sth->fetchrow_hashref();
-is($row_2->{name}, 'molecular_function');
-
-my $row_3 = $sth->fetchrow_hashref();
-is($row_3->{name}, $cyanidin_name);
+is($sth->fetchrow_hashref()->{name}, $cyanidin_name);
+is($sth->fetchrow_hashref()->{name}, 'is_a');
+is($sth->fetchrow_hashref()->{name}, 'molecular_function');
 

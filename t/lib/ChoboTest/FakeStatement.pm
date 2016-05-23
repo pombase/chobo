@@ -9,6 +9,7 @@ use Text::CSV::Encoded;
 has statement => (is => 'rw', required => 1);
 has storage => (is => 'rw', required => 1, isa => 'HashRef');
 has query_table_name => (is => 'rw');
+has query_order_by => (is => 'rw');
 has query_column_names => (is => 'rw', isa => 'ArrayRef');
 has rows => (is => 'rw', isa => 'ArrayRef');
 
@@ -18,15 +19,25 @@ sub BUILD
 
   my $statement = $self->statement();
 
-  if ($statement =~ /select\s+(.*?)\s+from\s+(\S+)/i) {
-    $self->query_table_name($2);
+  if ($statement =~ /select\s+(.*?)\s+from\s+(\S+)(?:\s+order by\s+(.*))?/i) {
+    my $table_name = $2;
+    $self->query_table_name($table_name);
+    if (defined $3) {
+      $self->query_order_by($3);
+    } else {
+      $self->query_order_by($table_name . '_id');
+    }
 
     my @column_names = split /,\s*/, $1;
 
     $self->query_column_names(\@column_names);
   } else {
     if ($statement =~ /copy\s+(.*?)\s*\((.+)\) (FROM STDIN|TO STDOUT) CSV/i) {
-      $self->query_table_name($1);
+      my $table_name = $1;
+
+      $self->query_table_name($table_name);
+
+      $self->query_order_by($table_name . '_id');
 
       my @column_names = split /,\s*/, $2;
 
@@ -36,7 +47,20 @@ sub BUILD
     }
   }
 
-  $self->rows(clone $self->storage()->{$self->query_table_name()}->{rows});
+  my $table_data = $self->storage()->{$self->query_table_name()};
+
+  my $query_order_by_index =
+    $table_data->{column_info}->{$self->query_order_by()}->{index};
+
+  my @rows = sort {
+    if ($self->query_order_by() =~ /_id$/) {
+      $a->[$query_order_by_index] <=> $b->[$query_order_by_index];
+    } else {
+      $a->[$query_order_by_index] cmp $b->[$query_order_by_index];
+    }
+  } @{clone $self->storage()->{$self->query_table_name()}->{rows}};
+
+  $self->rows(\@rows);
 }
 
 sub execute
