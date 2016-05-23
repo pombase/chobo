@@ -9,30 +9,34 @@ has storage => (is => 'rw', isa => 'HashRef',
                 default => sub {
                   {
                     db => {
-                      id_counter => 101,
+                      id_counter => 102,
                       column_names => [
                         'db_id', 'name',
                       ],
                       rows => [
-                        [ 100, 'core', ]
+                        [ 100, 'core' ],
+                        [ 101, 'internal' ],
                       ],
                     },
                     dbxref =>{
-                      id_counter => 201,
+                      id_counter => 203,
                       column_names => [
                         'dbxref_id', 'accession', 'db_id',
                       ],
                       rows => [
-                        [ 200, 'is_a', 100, ]
-                        ],
+                        [ 200, 'is_a', 100 ],
+                        [ 201, 'exact', 101 ],
+                        [ 202, 'narrow', 101 ],
+                      ],
                     },
                     cv => {
-                      id_counter => 301,
+                      id_counter => 302,
                       column_names => [
                         'cv_id', 'name',
                       ],
                       rows => [
                         [ 300, 'core' ],
+                        [ 301, 'synonym_type' ],
                       ]
                     },
                     cvterm => {
@@ -42,7 +46,9 @@ has storage => (is => 'rw', isa => 'HashRef',
                         'dbxref_id', 'is_relationshiptype', 'is_obsolete',
                       ],
                       rows => [
-                        [ 400, 'is_a', 300, 200, 1, 0]
+                        [ 400, 'is_a', 300, 200, 1, 0],
+                        [ 401, 'exact', 301, 201, 0, 0],
+                        [ 402, 'narrow', 301, 202, 0, 0],
                       ]
                     },
                     cvtermsynonym => {

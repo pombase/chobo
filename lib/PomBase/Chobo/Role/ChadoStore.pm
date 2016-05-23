@@ -166,6 +166,34 @@ my %row_makers = (
       [$name, $cv_id, $dbxref_id, $is_relationshiptype, $is_obsolete];
     } $ontology_data->get_terms();
   },
+  cvtermsynonym => sub {
+    my $ontology_data = shift;
+    my $chado_data = shift;
+
+    my $synonym_type_cv =
+      $chado_data->get_cv_by_name('synonym_type');
+    my %synonym_types =
+      %{$chado_data->get_cvterms_by_cv_id($synonym_type_cv->{cv_id})};
+
+    map {
+      my $term = $_;
+
+      map {
+        my $synonym_type_name = $_->{scope};
+        my $synonym_type_term =
+          $synonym_types{lc $synonym_type_name} //
+          $synonym_types{uc $synonym_type_name};
+
+        if (!defined $synonym_type_term) {
+          die "unknown synonym scope: $synonym_type_name";
+        }
+
+        my $cvterm_id = $chado_data->get_cvterm_by_termid($term->id())->cvterm_id();
+
+        [$cvterm_id, $_->{synonym}, $synonym_type_term->{cvterm_id}];
+      } $term->synonyms();
+    } $ontology_data->get_terms();
+  },
   cvterm_relationship => sub {
     my $ontology_data = shift;
     my $chado_data = shift;
@@ -209,6 +237,7 @@ my %table_column_names = (
   dbxref => [qw(db_id accession)],
   cv => [qw(name)],
   cvterm => [qw(name cv_id dbxref_id is_relationshiptype is_obsolete)],
+  cvtermsynonym => [qw(cvterm_id synonym type_id)],
   cvterm_relationship => [qw(subject_id type_id object_id)],
 );
 
@@ -223,7 +252,7 @@ sub chado_store
 
   my $chado_data = $self->chado_data();
 
-  my @tables_to_store = qw(db dbxref cv cvterm cvterm_relationship);
+  my @tables_to_store = qw(db dbxref cv cvterm cvtermsynonym cvterm_relationship);
 
   for my $table_to_store (@tables_to_store) {
     my @rows = $row_makers{$table_to_store}->($self->ontology_data(),

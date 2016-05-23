@@ -66,6 +66,13 @@ BEGIN {
   }
 }
 
+sub synonyms
+{
+  my $self = shift;
+
+  return @{$self->{synonym} // []};
+}
+
 =head2 make_object
 
  Usage   : my $object = PomBase::Chobo::OntologyTerm->make_object($args);

@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 11;
+use Test::More tests => 14;
 use Test::Deep;
 use Text::CSV;
 
@@ -17,9 +17,12 @@ is ($sth->query_table_name(), 'cvterm');
 
 my $row_1 = $sth->fetchrow_hashref();
 cmp_deeply($row_1, { cvterm_id => 400, name => 'is_a', cv_id => 300 });
-
 my $row_2 = $sth->fetchrow_hashref();
-is($row_2, undef);
+cmp_deeply($row_2, {'cvterm_id' => 401, 'name' => 'exact', 'cv_id' => 301});
+my $row_3 = $sth->fetchrow_hashref();
+cmp_deeply($row_3, {'cvterm_id' => 402, 'name' => 'narrow', 'cv_id' => 301});
+my $row_4 = $sth->fetchrow_hashref();
+is($row_4, undef);
 
 
 $fake_dbh->do('COPY db(name) FROM STDIN CSV');
@@ -31,10 +34,12 @@ is ($sth->query_table_name(), 'db');
 
 $row_1 = $sth->fetchrow_hashref();
 cmp_deeply($row_1, { db_id => 100, name => 'core' });
-$row_1 = $sth->fetchrow_hashref();
-cmp_deeply($row_1, { db_id => 101, name => 'test_db' });
 $row_2 = $sth->fetchrow_hashref();
-is($row_2, undef);
+cmp_deeply($row_2, { db_id => 101, name => 'internal' });
+$row_3 = $sth->fetchrow_hashref();
+cmp_deeply($row_3, { db_id => 102, name => 'test_db' });
+$row_4 = $sth->fetchrow_hashref();
+is($row_4, undef);
 
 
 $fake_dbh->do('COPY dbxref(accession, db_id) FROM STDIN CSV');
@@ -48,11 +53,14 @@ is ($sth->query_table_name(), 'dbxref');
 
 my @expected_dbxrefs = (
   { dbxref_id => 200, accession => 'is_a', db_id => 100 },
-  { dbxref_id => 201, accession => 'test_dbref_1', db_id => 101 },
-  { dbxref_id => 202, accession => 'test_dbref_2', db_id => 101 }
+  { dbxref_id => 201, accession => 'exact', db_id => 101 },
+  { dbxref_id => 202, accession => 'narrow', db_id => 101 },
+  { dbxref_id => 203, accession => 'test_dbref_1', db_id => 101 },
+  { dbxref_id => 204, accession => 'test_dbref_2', db_id => 101 }
 );
 
-cmp_deeply([$sth->fetchrow_hashref(), $sth->fetchrow_hashref(), $sth->fetchrow_hashref()],
+cmp_deeply([$sth->fetchrow_hashref(), $sth->fetchrow_hashref(), $sth->fetchrow_hashref(),
+            $sth->fetchrow_hashref(), $sth->fetchrow_hashref()],
            \@expected_dbxrefs);
 my $end_row = $sth->fetchrow_hashref();
 is($end_row, undef);

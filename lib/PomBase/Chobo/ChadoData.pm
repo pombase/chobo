@@ -255,6 +255,14 @@ sub get_cvterm_by_cvterm_id
   return $self->cvterm_data()->{by_cvterm_id};
 }
 
+sub get_cvterms_by_cv_id
+{
+  my $self = shift;
+  my $cv_id = shift;
+
+  return $self->cvterm_data()->{by_cv_id}->{$cv_id};
+}
+
 sub get_cvterm_by_termid
 {
   my $self = shift;

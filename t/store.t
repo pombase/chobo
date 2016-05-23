@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 9;
+use Test::More tests => 13;
 use Test::Deep;
 
 use lib qw(t/lib);
@@ -41,10 +41,13 @@ $sth->execute();
 
 my $cyanidin_term = $sth->fetchrow_hashref();
 is ($cyanidin_term->{name}, $cyanidin_name);
+my $exact_term = $sth->fetchrow_hashref();
+is ($exact_term->{name}, 'exact');
 my $is_a_term = $sth->fetchrow_hashref();
 is ($is_a_term->{name}, 'is_a');
 my $molecular_function_term = $sth->fetchrow_hashref();
 is ($molecular_function_term->{name}, 'molecular_function');
+is ($sth->fetchrow_hashref()->{name}, 'narrow');
 
 
 $sth = $fake_handle->prepare("select subject_id, type_id, object_id from cvterm_relationship order by subject_id");
@@ -57,3 +60,21 @@ is ($rel->{type_id}, $is_a_term->{cvterm_id});
 is ($rel->{object_id}, $molecular_function_term->{cvterm_id});
 
 
+$sth = $fake_handle->prepare("select cvterm_id, synonym, type_id from cvtermsynonym order by synonym");
+$sth->execute();
+
+my $synonym_1 = $sth->fetchrow_hashref();
+my $synonym_2 = $sth->fetchrow_hashref();
+
+cmp_deeply ($synonym_1,
+            {
+              type_id => $exact_term->{cvterm_id},
+              synonym => 'cyanidin 3-O-glucoside-yadda-yadda',
+              cvterm_id => $cyanidin_term->{cvterm_id},
+            });
+cmp_deeply ($synonym_2,
+            {
+              type_id => $exact_term->{cvterm_id},
+              synonym => 'molecular function',
+              cvterm_id => $molecular_function_term->{cvterm_id},
+            });
