@@ -218,14 +218,6 @@ sub get_db_names
   return keys %{$self->terms_by_db_name()};
 }
 
-sub get_terms_by_db_name
-{
-  my $self = shift;
-  my $db_name = shift;
-
-  return values %{$self->terms_by_db_name()->{$db_name}};
-}
-
 sub get_terms
 {
   my $self = shift;
