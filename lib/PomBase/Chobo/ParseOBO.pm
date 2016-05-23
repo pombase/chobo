@@ -108,6 +108,8 @@ sub _finish_stanza
         }
       } @{$current->{synonym}}
     ];
+
+    $current->{synonym} = [values %seen_synonyms];
   }
 
   my $options = { namespace_from_metadata => $namespace_from_metadata };
