@@ -200,53 +200,50 @@ sub _get_cvtermsynonyms
   return \%by_cvterm_id
 }
 
+sub _make_term
+{
+  my $self = shift;
+  my $cvterm_data = shift;
+
+  my $dbxref_id = $cvterm_data->[3];
+
+  my $by_dbxref_id = $self->dbxref_data()->{by_dbxref_id};
+  my $termid = $by_dbxref_id->{$dbxref_id}->{termid};
+
+  return bless {
+    id => $termid,
+    cvterm_id => $cvterm_data->[0],
+    name => $cvterm_data->[1],
+    cv_id => $cvterm_data->[2],
+    dbxref_id => $dbxref_id,
+    is_obsolete => $cvterm_data->[4],
+    is_relationshiptype => $cvterm_data->[5],
+  }, 'PomBase::Chobo::OntologyTerm';
+}
+
 sub _build_cvterm_data
 {
   my $self = shift;
 
   my %by_cvterm_id = ();
   my %by_cv_id = ();
-  my %by_dbxref_id = ();
+  my %by_termid = ();
 
   my $proc = sub {
     my $fields_ref = shift;
-    my @fields = @$fields_ref;
-    my ($cvterm_id, $name, $cv_id, $dbxref_id, $is_obsolete,
-        $is_relationshiptype) = @fields;
-    $by_cvterm_id{$cvterm_id} = \@fields;
-    $by_cv_id{$cv_id}->{$name} = \@fields;
-    $by_dbxref_id{$dbxref_id} = \@fields;
+
+    my $term = $self->_make_term($fields_ref);
+
+    $by_cvterm_id{$term->cvterm_id()} = $term;
+    $by_cv_id{$term->cv_id()}->{$term->name()} = $term;
+    $by_termid{$term->id()} = $term;
   };
 
   $self->_get_by_copy('cvterm', \@cvterm_column_names, $proc);
 
-  my $dbxref_by_termid = $self->dbxref_data()->{by_termid};
-
-  my %by_termid = map {
-    my $termid = $_;
-    my $dbxref_id = $dbxref_by_termid->{$termid}->{dbxref_id};
-    my $cvterm_data = $by_dbxref_id{$dbxref_id};
-
-    if (defined $cvterm_data) {
-      my $cvterm_data = bless {
-        id => $termid,
-        cvterm_id => $cvterm_data->[0],
-        name => $cvterm_data->[1],
-        cv_id => $cvterm_data->[2],
-        dbxref_id => $cvterm_data->[3],
-        is_obsolete => $cvterm_data->[4],
-        is_relationshiptype => $cvterm_data->[5],
-      }, 'PomBase::Chobo::OntologyTerm';
-      ($termid, $cvterm_data);
-    } else {
-      ();
-    }
-  } $self->get_all_termids();
-
   return {
     by_cvterm_id => \%by_cvterm_id,
     by_cv_id => \%by_cv_id,
-    by_dbxref_id => \%by_dbxref_id,
     by_termid => \%by_termid,
   };
 }
@@ -264,13 +261,6 @@ sub get_cvterm_by_termid
   my $termid = shift;
 
   return $self->cvterm_data()->{by_termid}->{$termid};
-}
-
-sub get_all_termids
-{
-  my $self = shift;
-
-  return keys %{$self->dbxref_data()->{by_termid}};
 }
 
 sub get_all_cvterms
@@ -314,6 +304,7 @@ sub _build_dbxref_data
     if (!defined $db_name) {
       die "no db name for db $db_id";
     }
+
     my $termid;
 
     if ($db_name eq '_global') {
@@ -321,6 +312,8 @@ sub _build_dbxref_data
     } else {
       $termid = "$db_name:$accession";
     }
+
+    $data{termid} = $termid;
 
     $by_dbxref_id{$dbxref_id} = \%data;
     $by_termid{$termid} = \%data;

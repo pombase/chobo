@@ -46,6 +46,7 @@ use List::Compare;
 
 has id => (is => 'ro', isa => 'Int', required => 1);
 has cvterm_id => (is => 'ro', isa => 'Int', required => 0);
+has cv_id => (is => 'ro', isa => 'Int', required => 0);
 has name => (is => 'ro', isa => 'Str');
 has namespace => (is => 'ro', isa => 'Str');
 has alt_id => (is => 'ro', isa => 'ArrayRef');
