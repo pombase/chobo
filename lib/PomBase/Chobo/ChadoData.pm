@@ -110,14 +110,6 @@ sub _build_cv_data
   return { by_id => $cvs_by_cv_id, by_name => $cvs_by_cv_name };
 }
 
-sub get_cv_by_id
-{
-  my $self = shift;
-  my $cv_id = shift;
-
-  return $self->cv_data()->{by_id}->{$cv_id};
-}
-
 sub get_cv_by_name
 {
   my $self = shift;
@@ -139,14 +131,6 @@ sub _build_db_data
 
   my ($dbs_by_db_id, $dbs_by_db_name) = $self->_get_cv_or_db('db');
   return { by_id => $dbs_by_db_id, by_name => $dbs_by_db_name, };
-}
-
-sub get_db_by_id
-{
-  my $self = shift;
-  my $db_id = shift;
-
-  return $self->db_data()->{by_id}->{$db_id};
 }
 
 sub get_db_by_name
@@ -274,22 +258,6 @@ sub get_cvterm_by_cvterm_id
   return $self->cvterm_data()->{by_cvterm_id};
 }
 
-sub get_cvterms_by_cv_id
-{
-  my $self = shift;
-  my $cv_id = shift;
-
-  return $self->cvterm_data()->{by_cv_id}->{$cv_id};
-}
-
-sub get_cvterm_by_dbxref_id
-{
-  my $self = shift;
-  my $dbxref_id = shift;
-
-  return $self->cvterm_data()->{by_dbxref_id}->{$dbxref_id};
-}
-
 sub get_cvterm_by_termid
 {
   my $self = shift;
@@ -312,28 +280,12 @@ sub get_all_cvterms
   return values %{$self->cvterm_data()->{by_termid}};
 }
 
-sub get_dbxref_by_dbxref_id
-{
-  my $self = shift;
-  my $dbxref_id = shift;
-
-  return $self->dbxref_data()->{by_dbxref_id}->{$dbxref_id};
-}
-
 sub get_dbxref_by_termid
 {
   my $self = shift;
   my $termid = shift;
 
   return $self->dbxref_data()->{by_termid}->{$termid};
-}
-
-sub get_dbxrefs_by_db_id
-{
-  my $self = shift;
-  my $db_id = shift;
-
-  return $self->dbxref_data()->{by_db_name}->{$db_id};
 }
 
 sub _build_dbxref_data
