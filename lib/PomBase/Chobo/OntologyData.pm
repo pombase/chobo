@@ -91,9 +91,7 @@ sub add
   for my $term (@$terms) {
     my @new_term_ids = ($term->{id});
 
-    if (defined $term->{alt_id}) {
-      push @new_term_ids, @{$term->{alt_id}};
-    }
+    push @new_term_ids, map { $_->{id}; } $term->alt_ids();
 
     my @found_existing_terms = ();
 
@@ -128,13 +126,14 @@ sub add
       }
     }
 
-    for my $id (@new_term_ids) {
-      $terms_by_id->{$id} = $term;
+    for my $id_details ($term->alt_ids(),
+                        { id => $term->{id},
+                          db_name => $term->{db_name},
+                          accession => $term->{accession},
+                         } ) {
+      $terms_by_id->{$id_details->{id}} = $term;
 
-      my $db_name = $term->{db_name};
-      my $accession = $term->{accession};
-
-      $self->terms_by_db_name()->{$db_name}->{$accession} = $term;
+      $self->terms_by_db_name()->{$id_details->{db_name}}->{$id_details->{accession}} = $term;
     }
 
     my $name = $term->{name};

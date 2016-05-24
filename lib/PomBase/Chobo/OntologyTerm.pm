@@ -73,6 +73,29 @@ sub synonyms
   return @{$self->{synonym} // []};
 }
 
+sub alt_ids
+{
+  my $self = shift;
+
+  return map {
+    my $val = $_;
+
+    if ($val =~ /(\S+):(\S+)/) {
+      {
+        id => $val,
+        db_name => $1,
+        accession => $2,
+      };
+    } else {
+      {
+        id => $val,
+        db_name => '_global',
+        accession => $val,
+      };
+    }
+  } @{$self->{alt_id} // []};
+}
+
 =head2 make_object
 
  Usage   : my $object = PomBase::Chobo::OntologyTerm->make_object($args);

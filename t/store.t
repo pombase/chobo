@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 16;
+use Test::More tests => 18;
 use Test::Deep;
 
 use lib qw(t/lib);
@@ -33,7 +33,6 @@ cmp_deeply([
   } $ontology_data->get_terms()],
            [{ name => 'molecular_function', id => 'GO:0003674' },
             { name => $cyanidin_name, id => 'GO:0102583' }]);
-
 
 
 my $sth = $fake_handle->prepare("select cvterm_id, name, cv_id from cvterm order by name");
@@ -89,3 +88,26 @@ cmp_deeply ($synonym_3,
             });
 
 is ($sth->fetchrow_hashref(), undef);
+
+
+$sth = $fake_handle->prepare("select accession, dbxref_id from dbxref order by dbxref_id");
+$sth->execute();
+
+my $go_0005554_dbxref_id;
+
+while (defined (my $dbxref = $sth->fetchrow_hashref())) {
+  if ($dbxref->{accession} eq '0005554') {
+    $go_0005554_dbxref_id = $dbxref->{dbxref_id};
+  }
+}
+
+
+$sth = $fake_handle->prepare("select cvterm_id, dbxref_id from cvterm_dbxref order by cvterm_id");
+$sth->execute();
+
+my $cvterm_dbxref = $sth->fetchrow_hashref();
+is ($sth->fetchrow_hashref(), undef);
+
+
+is($cvterm_dbxref->{cvterm_id}, $molecular_function_term->{cvterm_id});
+

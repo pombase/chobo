@@ -194,6 +194,25 @@ my %row_makers = (
       } $term->synonyms();
     } $ontology_data->get_terms();
   },
+  cvterm_dbxref => sub {
+    my $ontology_data = shift;
+    my $chado_data = shift;
+
+    map {
+      my $term = $_;
+
+      map {
+        my $alt_id = $_;
+
+        my $cvterm_id = $chado_data->get_cvterm_by_termid($term->id())->cvterm_id();
+        my $dbxref_details = $chado_data->get_dbxref_by_termid($alt_id->{id});
+
+        my $dbxref_id = $dbxref_details->{dbxref_id};
+
+        [$cvterm_id, $dbxref_id];
+      } $term->alt_ids();
+    } $ontology_data->get_terms();
+  },
   cvterm_relationship => sub {
     my $ontology_data = shift;
     my $chado_data = shift;
@@ -238,6 +257,7 @@ my %table_column_names = (
   cv => [qw(name)],
   cvterm => [qw(name cv_id dbxref_id is_relationshiptype is_obsolete)],
   cvtermsynonym => [qw(cvterm_id synonym type_id)],
+  cvterm_dbxref => [qw(cvterm_id dbxref_id)],
   cvterm_relationship => [qw(subject_id type_id object_id)],
 );
 
@@ -252,7 +272,7 @@ sub chado_store
 
   my $chado_data = $self->chado_data();
 
-  my @tables_to_store = qw(db dbxref cv cvterm cvtermsynonym cvterm_relationship);
+  my @tables_to_store = qw(db dbxref cv cvterm cvtermsynonym cvterm_dbxref cvterm_relationship);
 
   for my $table_to_store (@tables_to_store) {
     my @rows = $row_makers{$table_to_store}->($self->ontology_data(),
