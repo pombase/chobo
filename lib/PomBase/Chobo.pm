@@ -3,6 +3,8 @@ package PomBase::Chobo;
 use strict;
 use warnings;
 
+use 5.020;
+
 # VERSION
 
 =head1 NAME
