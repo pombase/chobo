@@ -1,10 +1,12 @@
-* PomBase-Chobo
+PomBase-Chobo
+=============
 
 Code for reading OBO files into a Chado database using PostgreSQL COPY.
 
 This repo contains the PomBase::Chobo module and the chobo_load.pl script.
 
-* Installation
+Installation
+------------
 
 To install, run the following commands:
 
@@ -13,11 +15,13 @@ To install, run the following commands:
 	./Build test
 	./Build install
 
-* Example usage
+Example usage
+-------------
 
-chobo_load.pl 'dbi:Pg:dbname=test-db' my_username my_password *.obo
+`chobo_load.pl 'dbi:Pg:dbname=test-db' my_username my_password *.obo`
 
-* License and Copyright
+License and Copyright
+---------------------
 
 Copyright (C) 2013 Kim Rutherford
 
