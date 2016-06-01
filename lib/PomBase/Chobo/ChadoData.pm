@@ -1,5 +1,7 @@
 package PomBase::Chobo::ChadoData;
 
+# VERSION
+
 =head1 NAME
 
 PomBase::Chobo::ChadoData - Read and store cv/db data from Chado

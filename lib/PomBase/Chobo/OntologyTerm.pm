@@ -1,5 +1,7 @@
 package PomBase::Chobo::OntologyTerm;
 
+# VERSION
+
 =head1 NAME
 
 PomBase::Chobo::OntologyTerm - Simple class for accessing term data

@@ -1,5 +1,7 @@
 package PomBase::Chobo::OntologyData;
 
+# VERSION
+
 =head1 NAME
 
 PomBase::Chobo::OntologyData - An in memory representation of an Ontology

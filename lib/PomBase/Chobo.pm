@@ -3,18 +3,13 @@ package PomBase::Chobo;
 use strict;
 use warnings;
 
+# VERSION
+
 =head1 NAME
 
 PomBase::Chobo - The great new PomBase::Chobo!
 
-=head1 VERSION
-
-Version 0.01
-
 =cut
-
-our $VERSION = '0.01';
-
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,7 @@
 package PomBase::Chobo::Role::ChadoStore;
 
+# VERSION
+
 =head1 NAME
 
 PomBase::Chobo::Role::ChadoStore - Code for storing terms in Chado

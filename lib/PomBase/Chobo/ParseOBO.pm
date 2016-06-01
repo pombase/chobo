@@ -1,5 +1,7 @@
 package PomBase::Chobo::ParseOBO;
 
+# VERSION
+
 =head1 NAME
 
 PomBase::Chobo::ParseOBO - Parse the bits of an OBO file needed for

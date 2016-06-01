@@ -1,5 +1,7 @@
 package PomBase::Chobo::OntologyConf;
 
+# VERSION
+
 =head1 NAME
 
 PomBase::Chobo::OntologyConf - Configuration for ontology data
