@@ -23,7 +23,7 @@ C<chobo_load.pl 'dbi:Pg:dbname=test-db' my_username my_password *.obo>
 
 =head2 License and Copyright
 
-Copyright (C) 2013 Kim Rutherford
+Copyright (C) 2016 Kim Rutherford
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published
