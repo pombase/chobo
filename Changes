@@ -1,5 +1,7 @@
 Revision history for PomBase-Chobo
 
 {{$NEXT}}
+          Fixed installation of chobo_load by removing Build.PL
 
 0.001     2016-06-01 21:02:38
+          Initial release
