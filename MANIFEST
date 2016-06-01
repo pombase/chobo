@@ -1,7 +1,0 @@
-Build.PL
-Changes
-lib/PomBase/Chobo.pm
-lib/PomBase/Chobo/ChadoData.pm
-lib/PomBase/Chobo/ParseOBO.pm
-MANIFEST
-README
