@@ -115,9 +115,18 @@ sub _get_relationship_terms
 my %row_makers = (
   db => sub {
     my $ontology_data = shift;
+    my $chado_data = shift;
+
+    my %chado_db_names = ();
+
+    map {
+      $chado_db_names{$_} = 1;
+    } $chado_data->get_db_names();
 
     return map {
       [$_];
+    } grep {
+      !$chado_db_names{$_};
     } $ontology_data->get_db_names();
   },
   dbxref => sub {
@@ -128,12 +137,20 @@ my %row_makers = (
       my $db_name = $_;
       my $db_id = $chado_data->get_db_by_name($db_name)->{db_id};
 
-      my %current_db_terms = %{$ontology_data->terms_by_db_name()->{$db_name}};
+      my %chado_termids = ();
+
+      map {
+        $chado_termids{$_} = 1;
+      } $chado_data->get_all_termids();
+
+      my @ont_db_termids = grep {
+        !$chado_termids{$_};
+      } $ontology_data->termids_by_db_name($db_name);
 
       map {
         my $accession = $_;
         [$db_id, $accession];
-     } keys %current_db_terms;
+      } @ont_db_termids;
     } $ontology_data->get_db_names();
   },
   cv => sub {
