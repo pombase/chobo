@@ -4,6 +4,7 @@ Build
 Build.bat
 Makefile.old
 PomBase-Chobo-*
+.build*
 _build*
 _build/*
 blib/*
