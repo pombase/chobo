@@ -89,9 +89,16 @@ sub alt_ids
         accession => $2,
       };
     } else {
+      my $db_name;
+      if (defined $self->metadata()->{ontology} &&
+          $self->metadata()->{ontology} eq 'ro') {
+        $db_name = 'OBO_REL'
+      } else {
+        $db_name = '_global';
+      }
       {
         id => $val,
-        db_name => '_global',
+        db_name => $db_name,
         accession => $val,
       };
     }
