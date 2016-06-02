@@ -33,7 +33,7 @@ $sth = $fake_dbh->prepare("select db_id, name from db");
 is ($sth->query_table_name(), 'db');
 
 $row_1 = $sth->fetchrow_hashref();
-cmp_deeply($row_1, { db_id => 100, name => 'core' });
+cmp_deeply($row_1, { db_id => 100, name => 'OBO_REL' });
 $row_2 = $sth->fetchrow_hashref();
 cmp_deeply($row_2, { db_id => 101, name => 'internal' });
 $row_3 = $sth->fetchrow_hashref();
