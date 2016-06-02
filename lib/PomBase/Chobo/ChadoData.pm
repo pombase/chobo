@@ -206,10 +206,11 @@ sub _make_term
 {
   my $self = shift;
   my $cvterm_data = shift;
+  my $dbxref_data = shift;
 
   my $dbxref_id = $cvterm_data->[3];
 
-  my $by_dbxref_id = $self->dbxref_data()->{by_dbxref_id};
+  my $by_dbxref_id = $dbxref_data->{by_dbxref_id};
   my $termid = $by_dbxref_id->{$dbxref_id}->{termid};
 
   return bless {
@@ -231,10 +232,12 @@ sub _build_cvterm_data
   my %by_cv_id = ();
   my %by_termid = ();
 
+  my $dbxref_data = $self->dbxref_data();
+
   my $proc = sub {
     my $fields_ref = shift;
 
-    my $term = $self->_make_term($fields_ref);
+    my $term = $self->_make_term($fields_ref, $dbxref_data);
 
     $by_cvterm_id{$term->cvterm_id()} = $term;
     $by_cv_id{$term->cv_id()}->{$term->name()} = $term;

@@ -41,7 +41,6 @@ use Mouse::Role;
 use Text::CSV::Encoded
 
 requires 'dbh';
-requires 'chado_data';
 requires 'ontology_data';
 
 use PomBase::Chobo::ChadoData;
@@ -272,13 +271,13 @@ sub chado_store
   my @cvterm_column_names =
     @PomBase::Chobo::ChadoData::cvterm_column_names;
 
-  my $chado_data = $self->chado_data();
-
   my @tables_to_store = qw(db dbxref cv cvterm cvtermsynonym cvterm_dbxref cvterm_relationship);
 
   for my $table_to_store (@tables_to_store) {
+    my $chado_data = PomBase::Chobo::ChadoData->new(dbh => $self->dbh());
+
     my @rows = $row_makers{$table_to_store}->($self->ontology_data(),
-                                              $self->chado_data());
+                                              $chado_data);
 
     $self->_copy_to_table($table_to_store, $table_column_names{$table_to_store},
                           \@rows);

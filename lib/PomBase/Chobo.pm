@@ -42,18 +42,10 @@ use PomBase::Chobo::OntologyData;
 
 
 has dbh => (is => 'ro');
-has chado_data => (is => 'ro', init_arg => undef, lazy_build => 1);
 has ontology_data => (is => 'ro', required => 1);
 has parser => (is => 'ro', init_arg => undef, lazy_build => 1);
 
 with 'PomBase::Chobo::Role::ChadoStore';
-
-sub _build_chado_data
-{
-  my $self = shift;
-
-  return PomBase::Chobo::ChadoData->new(dbh => $self->dbh());
-}
 
 sub _build_parser
 {
