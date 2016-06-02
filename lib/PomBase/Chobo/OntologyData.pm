@@ -1,7 +1,5 @@
 package PomBase::Chobo::OntologyData;
 
-# VERSION
-
 =head1 NAME
 
 PomBase::Chobo::OntologyData - An in memory representation of an Ontology
@@ -39,6 +37,8 @@ under the same terms as Perl itself.
 =head1 FUNCTIONS
 
 =cut
+
+# VERSION
 
 use Mouse;
 

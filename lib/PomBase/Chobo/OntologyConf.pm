@@ -1,7 +1,5 @@
 package PomBase::Chobo::OntologyConf;
 
-# VERSION
-
 =head1 NAME
 
 PomBase::Chobo::OntologyConf - Configuration for ontology data
@@ -34,6 +32,8 @@ under the same terms as Perl itself.
 =head1 FUNCTIONS
 
 =cut
+
+# VERSION
 
 use warnings;
 use Carp;

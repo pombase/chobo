@@ -1,12 +1,5 @@
 package PomBase::Chobo;
 
-use strict;
-use warnings;
-
-use 5.020;
-
-# VERSION
-
 =head1 NAME
 
 PomBase::Chobo - The great new PomBase::Chobo!
@@ -35,6 +28,10 @@ by the Free Software Foundation; or the Artistic License.
 See http://dev.perl.org/licenses/ for more information.
 
 =cut
+
+# VERSION
+
+use 5.020;
 
 use Mouse;
 use Text::CSV;

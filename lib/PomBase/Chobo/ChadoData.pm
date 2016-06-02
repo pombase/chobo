@@ -1,7 +1,5 @@
 package PomBase::Chobo::ChadoData;
 
-# VERSION
-
 =head1 NAME
 
 PomBase::Chobo::ChadoData - Read and store cv/db data from Chado
@@ -36,6 +34,8 @@ under the same terms as Perl itself.
 =head1 FUNCTIONS
 
 =cut
+
+# VERSION
 
 use Mouse;
 

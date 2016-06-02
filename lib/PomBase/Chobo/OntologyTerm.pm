@@ -1,7 +1,5 @@
 package PomBase::Chobo::OntologyTerm;
 
-# VERSION
-
 =head1 NAME
 
 PomBase::Chobo::OntologyTerm - Simple class for accessing term data
@@ -36,6 +34,8 @@ under the same terms as Perl itself.
 =head1 FUNCTIONS
 
 =cut
+
+# VERSION
 
 use Mouse;
 use Carp;
