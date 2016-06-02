@@ -2,6 +2,10 @@ Revision history for PomBase-Chobo
 
 {{$NEXT}}
 
+0.003     2016-06-02 14:46:28
+          Now explicity require Perl v5.20
+          (Internal) Builds correctly on Travis-CI
+
 0.002     2016-06-01 21:58:33
           Fixed installation of chobo_load by removing Build.PL
 
