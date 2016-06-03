@@ -155,9 +155,18 @@ my %row_makers = (
   },
   cv => sub {
     my $ontology_data = shift;
+    my $chado_data = shift;
+
+    my %chado_cv_names = ();
+
+    map {
+      $chado_cv_names{$_} = 1;
+    } $chado_data->get_cv_names();
 
     return map {
       [$_];
+    } grep {
+      !$chado_cv_names{$_};
     } $ontology_data->get_cv_names();
   },
   cvterm => sub {
