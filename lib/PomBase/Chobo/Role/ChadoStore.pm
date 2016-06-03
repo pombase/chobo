@@ -144,8 +144,8 @@ my %row_makers = (
       } $chado_data->get_all_termids();
 
       my @ont_db_termids = grep {
-        !$chado_termids{$_};
-      } $ontology_data->termids_by_db_name($db_name);
+        !$chado_termids{"$db_name:$_"};
+      } $ontology_data->accessions_by_db_name($db_name);
 
       map {
         my $accession = $_;
