@@ -3,6 +3,8 @@ package ChoboTest::FakeStatement;
 use Mouse;
 
 use Clone qw(clone);
+use Carp qw(confess);
+use List::Util qw(first);
 use Text::CSV;
 use Text::CSV::Encoded;
 
@@ -63,6 +65,31 @@ sub BUILD
   $self->rows(\@rows);
 }
 
+sub first_index
+{
+  my $val = shift;
+  my @array = @_;
+
+  return first { $array[$_] eq $val } 0..$#array;
+}
+
+sub check_unique
+{
+  my @rows = @_;
+
+  my %counts = ();
+
+  for my $row (@rows) {
+    if ($counts{$row}) {
+      return $row;
+    }
+
+    $counts{$row} = 1;
+  }
+
+  return undef;
+}
+
 sub execute
 {
   return 1;
@@ -98,6 +125,42 @@ sub fetchrow_hashref
 {
   my $self = shift;
   return $self->_as_hashref(shift @{$self->rows()});
+}
+
+sub _check_constraints
+{
+  my $self = shift;
+
+  my $store_table_name = $self->query_table_name();
+  my $table_storage = $self->storage()->{$store_table_name};
+
+  my $unique_columns = $table_storage->{unique_columns};
+
+  if ($unique_columns) {
+    my $column_names = $table_storage->{column_names};
+    my $rows = $table_storage->{rows};
+
+    my @column_indexes = map {
+      first_index($_, @$column_names);
+    } @$unique_columns;
+
+    my $col_values = sub {
+      my $row = shift;
+
+      return map {
+        $row->[$_];
+      } @column_indexes;
+    };
+
+    my $check_return =
+      check_unique(map { join '-', $col_values->($_); } @$rows);
+
+    if ($check_return) {
+      return "unique constraint failed for $store_table_name: $check_return\n";
+    }
+  }
+
+  return undef;
 }
 
 sub pg_putcopydata
@@ -139,6 +202,14 @@ sub pg_putcopydata
   $insert_row[$id_index] = $table_data->{'id_counter'}++;
 
   push @{$table_data->{rows}}, \@insert_row;
+
+  my $check_res = $self->_check_constraints();
+
+  if ($check_res) {
+    confess $check_res;
+  }
+
+  return 1;
 }
 
 sub pg_getcopydata

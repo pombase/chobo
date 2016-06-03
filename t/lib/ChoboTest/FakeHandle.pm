@@ -2,34 +2,7 @@ package ChoboTest::FakeHandle;
 
 use Mouse;
 
-use List::Util qw(first);
-
 use ChoboTest::FakeStatement;
-
-sub first_index
-{
-  my $val = shift;
-  my @array = @_;
-
-  return first { $array[$_] eq $val } 0..$#array;
-}
-
-sub check_unique
-{
-  my @rows = @_;
-
-  my %counts = ();
-
-  for my $row (@rows) {
-    if ($counts{$row}) {
-      return $row;
-    }
-
-    $counts{$row} = 1;
-  }
-
-  return undef;
-}
 
 has current_sth => (is => 'rw', isa => 'Maybe[ChoboTest::FakeStatement]', required => 0);
 has storage => (is => 'rw', isa => 'HashRef',
@@ -149,35 +122,6 @@ sub pg_getcopydata
 sub pg_putcopyend
 {
   my $self = shift;
-
-  my $store_table_name = $self->current_sth()->query_table_name();
-  my $table_storage = $self->storage()->{$store_table_name};
-
-  my $unique_columns = $table_storage->{unique_columns};
-
-  if ($unique_columns) {
-    my $column_names = $table_storage->{column_names};
-    my $rows = $table_storage->{rows};
-
-    my @column_indexes = map {
-      first_index($_, @$column_names);
-    } @$unique_columns;
-
-    my $col_values = sub {
-      my $row = shift;
-
-      return map {
-        $row->[$_];
-      } @column_indexes;
-    };
-
-    my $check_return =
-      check_unique(map { join '-', $col_values->($_); } @$rows);
-
-    if ($check_return) {
-      die "unique constraint failed for $store_table_name: $check_return\n";
-    }
-  }
 
   $self->current_sth(undef);
 
