@@ -1,6 +1,8 @@
 Revision history for PomBase-Chobo
 
 {{$NEXT}}
+
+0.004     2016-06-05 16:10:46
           Add missing metadata() method on OntologyTerm
 
 0.003     2016-06-02 14:46:28
