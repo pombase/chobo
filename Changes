@@ -1,6 +1,7 @@
 Revision history for PomBase-Chobo
 
 {{$NEXT}}
+          Add missing metadata() method on OntologyTerm
 
 0.003     2016-06-02 14:46:28
           Now explicity require Perl v5.20

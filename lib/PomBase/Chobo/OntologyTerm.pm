@@ -55,6 +55,7 @@ has alt_id => (is => 'ro', isa => 'ArrayRef');
 has is_relationshiptype => (is => 'ro', isa => 'Bool');
 has source_file => (is => 'ro', isa => 'Str', required => 1);
 has source_file_line_number => (is => 'ro', isa => 'Str', required => 1);
+has metadata => (is => 'ro');
 
 our @field_names;
 our %field_conf;

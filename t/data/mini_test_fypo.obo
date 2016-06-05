@@ -274,4 +274,5 @@ property_value: usage "Inverse of has_output. Relation between a structure and a
 [Typedef]
 id: has_part
 name: has_part
+alt_id: has_some_part
 is_transitive: true
