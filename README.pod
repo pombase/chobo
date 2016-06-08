@@ -10,7 +10,7 @@ PostgreSQL COPY.
 
 =over
 
-=item * Fast - loads go-basic.obo in 40 seconds
+=item * Fast
 
 =item * Few dependencies
 
@@ -32,6 +32,9 @@ PostgreSQL COPY.
 
 - an is_a relation
 - a CV named "synonym_type" containing all synonym type from input OBO files
+
+An example Chado DB containing these is here:
+L<https://github.com/pombase/pombase-legacy/blob/master/pombase-chado-base.dump?raw=true>
 
 =back
 
