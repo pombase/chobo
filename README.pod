@@ -18,7 +18,7 @@ To install, run the following commands:
 
 =head2 Example usage
 
-C<chobo_load.pl 'dbi:Pg:dbname=test-db' my_username my_password *.obo>
+C<chobo_load 'dbi:Pg:dbname=test-db' my_username my_password *.obo>
 
 
 =head2 License and Copyright
