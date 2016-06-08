@@ -51,6 +51,8 @@ if (@ARGV < 4) {
 
 my ($connect_str, $user, $pass, @filenames) = @ARGV;
 
+$connect_str = "dbi:Pg:dbname=$connect_str" unless $connect_str =~ /^dbi:Pg:dbname=/;
+
 my $dbh = DBI->connect($connect_str, $user, $pass,
                        { AutoCommit => 0, PrintError => 0 })
   or die "Cannot connect using $: $DBI::errstr\n";
