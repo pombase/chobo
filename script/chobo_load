@@ -22,7 +22,7 @@ sub usage
 
   die <<"USAGE";
 usage:
-  $0 [-d] connect_string username password obo_filename(s)
+  $0 [-d] db_name username password obo_filename(s)
 or:
   $0 -h
 
