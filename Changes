@@ -2,6 +2,8 @@ Revision history for PomBase-Chobo
 
 {{$NEXT}}
 
+0.005     2016-06-08 15:47:33
+
 0.004     2016-06-05 16:10:46
           Handle reloading cv, db and dbxref rows
           Check constraints after inserting each row in the test DB
