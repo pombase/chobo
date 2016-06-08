@@ -22,12 +22,19 @@ sub usage
 
   die <<"USAGE";
 usage:
-  $0 [-d] connect_string username password filename(s)
+  $0 [-d] connect_string username password obo_filename(s)
 or:
   $0 -h
 
   -d  Dry run - rollback at the end of loading
   -h  Show this help message
+
+Loads one or more OBO files into a Chado database
+
+examples:
+  $0 test-chado-db dbuser dbpass go-basic.obo fypo-basic.obo
+
+  $0 'dbi:Pg:dbname=test-chado-db' dbuser dbpass go-basic.obo fypo-basic.obo
 
 USAGE
 }
