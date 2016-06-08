@@ -2,8 +2,10 @@
 
 =head1 PomBase-Chobo
 
-Prototype code for reading OBO files into a Chado database using
-PostgreSQL COPY.
+Prototype code from PomBase for reading OBO files into a Chado
+database using PostgreSQL COPY.
+
+L<https://github.com/pombase/chobo>
 
 
 =head1 Features
