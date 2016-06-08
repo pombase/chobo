@@ -10,7 +10,7 @@ PostgreSQL COPY.
 
 =over
 
-=item * Fast - loads go-basic.obo in 30 seconds
+=item * Fast - loads go-basic.obo in 40 seconds
 
 =item * Few dependencies
 
@@ -40,18 +40,18 @@ PostgreSQL COPY.
 
 From CPAN:
 
-C<cpan PomBase::Chobo>
+ cpan PomBase::Chobo
 
 or
 
-C<cpanm PomBase::Chobo>
+ cpanm PomBase::Chobo>
 
 To install from Git:
 
-C<cpanm Dist::Zilla>
-C<git clone https://github.com/pombase/chobo.git>
-C<cd chobo>
-C<dzil install>
+ cpanm Dist::Zilla
+ git clone https://github.com/pombase/chobo.git
+ cd chobo
+ dzil install
 
 
 =head2 Example usage
