@@ -71,14 +71,13 @@ sub _finish_stanza
   my $namespace_from_metadata = 0;
 
   if (!defined $current->{namespace}) {
-    if (defined $metadata_ref->{'ontology'} &&
-        $metadata_ref->{'ontology'} eq 'ro') {
-      $current->{namespace} = 'relationship';
-    } else {
-      $current->{namespace} =
-        $metadata_ref->{'default-namespace'} //
-        $metadata_ref->{'ontology'} //
-        $current->{source_file} . '::' . $current->{id} =~ s/:.*//r;
+    $current->{namespace} =
+      $metadata_ref->{'default-namespace'} //
+      $metadata_ref->{'ontology'} //
+      $current->{source_file} . '::' . $current->{id} =~ s/:.*//r;
+
+    if ($current->{namespace} eq 'ro') {
+      $current->{namespace} = 'relations';
     }
 
     $namespace_from_metadata = 1;
