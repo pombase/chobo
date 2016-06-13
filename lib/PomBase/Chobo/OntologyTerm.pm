@@ -2,7 +2,7 @@ package PomBase::Chobo::OntologyTerm;
 
 =head1 NAME
 
-PomBase::Chobo::OntologyTerm - Simple class for accessing term data
+PomBase::Chobo::OntologyTerm - Code for holding term data read from an OBO file
 
 =head1 SYNOPSIS
 
