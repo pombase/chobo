@@ -1,6 +1,8 @@
 Revision history for PomBase-Chobo
 
 {{$NEXT}}
+
+0.006     2016-06-13 12:34:29
           Use "relations" as the CV name for RO, see:
             https://github.com/GMOD/Chado/issues/17
           Documentation improvements
