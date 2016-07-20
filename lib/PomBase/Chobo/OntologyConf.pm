@@ -50,6 +50,17 @@ our %field_conf = (
       $val;
     }
   },
+  def => {
+    type => 'SINGLE',
+    process => sub {
+      my $val = shift;
+      $val =~ s/"(.*)".*/$1/g;
+      $val;
+    }
+  },
+  comment => {
+    type => 'SINGLE',
+  },
   is_obsolete => {
     type => 'SINGLE',
     process => sub {

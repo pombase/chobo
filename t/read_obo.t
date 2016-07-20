@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 18;
+use Test::More tests => 20;
 use Test::Deep;
 
 use PomBase::Chobo::ParseOBO;
@@ -28,6 +28,8 @@ $fypo_0000133 = $ontology_data->get_term_by_id($lookup_id);
 
 is ($fypo_0000133->name(), $lookup_name);
 is ($fypo_0000133->id(), $lookup_id);
+is ($fypo_0000133->def(), 'A cell phenotype in which cells contain more than one nucleus apiece and are elongated.');
+is ($fypo_0000133->comment(), 'Test comment.');
 
 is ($ontology_data->get_namespaces(), 2);
 
