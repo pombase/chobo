@@ -56,7 +56,7 @@ From CPAN:
 
 or
 
- cpanm PomBase::Chobo>
+ cpanm PomBase::Chobo
 
 To install from Git:
 
