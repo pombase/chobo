@@ -2,6 +2,7 @@ Revision history for PomBase-Chobo
 
 {{$NEXT}}
           Fix OBO parser to read def: and comment: lines
+          Store definition in cvterm rows
 
 0.006     2016-06-13 12:34:29
           Use "relations" as the CV name for RO, see:
