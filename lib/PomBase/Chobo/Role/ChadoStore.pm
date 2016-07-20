@@ -186,11 +186,12 @@ my %row_makers = (
       }
 
       my $name = $term->name();
+      my $definition = $term->def();
       my $dbxref_id = $dbxref->{dbxref_id};
       my $is_relationshiptype = $term->{is_relationshiptype};
       my $is_obsolete = $term->{is_obsolete} ? 1 : 0;
 
-      [$name, $cv_id, $dbxref_id, $is_relationshiptype, $is_obsolete];
+      [$name, $definition, $cv_id, $dbxref_id, $is_relationshiptype, $is_obsolete];
     } $ontology_data->get_terms();
   },
   cvtermsynonym => sub {
@@ -282,7 +283,7 @@ my %table_column_names = (
   db => [qw(name)],
   dbxref => [qw(db_id accession)],
   cv => [qw(name)],
-  cvterm => [qw(name cv_id dbxref_id is_relationshiptype is_obsolete)],
+  cvterm => [qw(name definition cv_id dbxref_id is_relationshiptype is_obsolete)],
   cvtermsynonym => [qw(cvterm_id synonym type_id)],
   cvterm_dbxref => [qw(cvterm_id dbxref_id)],
   cvterm_relationship => [qw(subject_id type_id object_id)],

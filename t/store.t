@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 18;
+use Test::More tests => 19;
 use Test::Deep;
 
 use lib qw(t/lib);
@@ -24,22 +24,27 @@ is($ontology_data->get_terms(), 2);
 
 my $cyanidin_name =
   qq|cyanidin 3-O-glucoside-(2"-O-xyloside) 6''-O-acyltransferase activity|;
+my $cyanidin_def =
+  qq|Catalysis of the reaction: cyanidin 3-O-beta-D-sambubioside +4-coumaryl-CoA <=> cyanidin 3-O-[2|;
 
 cmp_deeply([
   sort {
     $a->{id} cmp $b->{id};
   } map {
-    { name => $_->{name}, id => $_->{id} }
+    { name => $_->{name}, id => $_->{id}, definition => $_->{def} }
   } $ontology_data->get_terms()],
-           [{ name => 'molecular_function', id => 'GO:0003674' },
-            { name => $cyanidin_name, id => 'GO:0102583' }]);
+           [{ name => 'molecular_function', id => 'GO:0003674',
+              definition => 'Elemental activities, such as catalysis or binding, describing the actions of a gene product at the molecular level. A given gene product may exhibit one or more molecular functions.' },
+            { name => $cyanidin_name, id => 'GO:0102583',
+              definition => $cyanidin_def }]);
 
 
-my $sth = $fake_handle->prepare("select cvterm_id, name, cv_id from cvterm order by name");
+my $sth = $fake_handle->prepare("select cvterm_id, definition, name, cv_id from cvterm order by name");
 $sth->execute();
 
 my $cyanidin_term = $sth->fetchrow_hashref();
 is ($cyanidin_term->{name}, $cyanidin_name);
+is ($cyanidin_term->{definition}, $cyanidin_def);
 my $exact_term = $sth->fetchrow_hashref();
 is ($exact_term->{name}, 'exact');
 my $is_a_term = $sth->fetchrow_hashref();

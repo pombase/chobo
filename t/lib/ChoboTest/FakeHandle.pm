@@ -45,13 +45,13 @@ has storage => (is => 'rw', isa => 'HashRef',
                     cvterm => {
                       id_counter => 401,
                       column_names => [
-                        'cvterm_id', 'name', 'cv_id',
+                        'cvterm_id', 'name', 'definition', 'cv_id',
                         'dbxref_id', 'is_relationshiptype', 'is_obsolete',
                       ],
                       rows => [
-                        [ 400, 'is_a', 300, 200, 1, 0],
-                        [ 401, 'exact', 301, 201, 0, 0],
-                        [ 402, 'narrow', 301, 202, 0, 0],
+                        [ 400, 'is_a', 'is_a', 300, 200, 1, 0],
+                        [ 401, 'exact', 'exact', 301, 201, 0, 0],
+                        [ 402, 'narrow', 'narrow', 301, 202, 0, 0],
                       ],
                       unique_columns => ['name', 'cv_id'],
                     },
