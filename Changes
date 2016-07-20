@@ -1,6 +1,8 @@
 Revision history for PomBase-Chobo
 
 {{$NEXT}}
+
+0.007     2016-07-20 21:20:12
           Fix OBO parser to read def: and comment: lines
           Store definition in cvterm rows
 
