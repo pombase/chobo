@@ -28,7 +28,7 @@ L<https://github.com/pombase/chobo>
 
 =item * Uses a lot of memory (500MB to read and store GO)
 
-=item * Currently ignores stanza tags that PomBase doesn't use (eg. "def:")
+=item * Currently ignores stanza tags that PomBase doesn't use (eg. "xref:")
 
 =item * The destination Chado database must contain:
 
