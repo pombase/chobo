@@ -1,6 +1,9 @@
 Revision history for PomBase-Chobo
 
 {{$NEXT}}
+          Doc fixes
+          Fix term synonyms parsing and add a test for it
+          Add subsets() and is_obsolete() methods to OntologyTerm
 
 0.007     2016-07-20 21:20:12
           Fix OBO parser to read def: and comment: lines
