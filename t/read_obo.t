@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 20;
+use Test::More tests => 24;
 use Test::Deep;
 
 use PomBase::Chobo::ParseOBO;
@@ -97,3 +97,47 @@ cmp_deeply(\@dodgy_terms,
              'cyanidin 3-O-glucoside-(2"-O-xyloside) 6\'\'-O-acyltransferase activity',
              'molecular_function'
            ]);
+
+
+# test ->subsets() and ->synonyms()
+my $fypo_0001320 = $ontology_data->get_term_by_id('FYPO:0001320');
+
+is ($fypo_0001320->name(), 'vegetative cell phenotype');
+is ($fypo_0001320->id(), 'FYPO:0001320');
+
+cmp_deeply([sort $fypo_0001320->subsets()],
+           ['qc_do_not_annotate', 'qc_do_not_manually_annotate']);
+
+my @expected_synonyms =
+  (
+    {
+      'synonym' => 'cell phenotype during vegetative growth',
+      'scope' => 'NARROW',
+      'dbxrefs' => []
+    },
+    {
+      'dbxrefs' => [
+        'PomBase:mah'
+      ],
+      'scope' => 'RELATED',
+      'synonym' => 'fission yeast vegetative cell phenotype'
+    },
+    {
+      'synonym' => 'vegetative cell phenotype during vegetative growth',
+      'scope' => 'EXACT',
+      'dbxrefs' => [
+        'PomBase:mah'
+      ]
+    },
+    {
+      'scope' => 'EXACT',
+      'type' => 'A_TYPE',
+      'dbxrefs' => [
+        'PomBase:mah'
+      ],
+      'synonym' => 'vegetative cell phenotype in vegetative growth'
+    },
+  );
+
+  cmp_deeply(\@expected_synonyms,
+             [sort { $a->{synonym} cmp $b->{synonym} } $fypo_0001320->synonyms()]);

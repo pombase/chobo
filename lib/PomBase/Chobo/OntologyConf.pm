@@ -139,23 +139,43 @@ our %field_conf = (
       my $val = shift;
       if ($val =~ /^"(.+?)"\s*(.*)/) {
         my $synonym = $1;
+        my @dbxrefs = ();
         my $rest = $2;
+
         my %ret = (
           synonym => $synonym,
         );
 
-        if ($rest =~ /^\s*(\S+)\s+(?:(?:(\S+)\s+)?(?:\s+\[([^\]]*)\]))?/) {
-          my ($scope, $type, $dbxrefs) = ($1, $2, $3);
+        my $scope_and_type;
 
-          $ret{scope} = $scope;
-          $ret{type} = $type;
-
-          my @dbxrefs = ();
-          if (defined $dbxrefs) {
-            @dbxrefs = split /\s*,\s*/, $dbxrefs;
+        if ($rest =~ /^(?:\s*(\S.*)\s+)?\[([^\]]*)\]/) {
+          if (defined $1) {
+            $scope_and_type = $1;
+          } else {
+            $scope_and_type = 'RELATED';
           }
-          $ret{dbxrefs} = \@dbxrefs;
+
+          my $dbxrefs_match = $2;
+
+          if (defined $dbxrefs_match) {
+            @dbxrefs = split /\s*,\s*/, $dbxrefs_match;
+          }
+        } else {
+          $scope_and_type = $rest;
         }
+
+        if (defined $scope_and_type) {
+          if ($scope_and_type =~ /(\S+)\s+(\S+)/) {
+            my ($scope, $type) = ($1, $2, $3);
+
+            $ret{scope} = $scope;
+            $ret{type} = $type;
+          } else {
+            $ret{scope} = $scope_and_type;
+          }
+        }
+
+        $ret{dbxrefs} = \@dbxrefs;
 
         return \%ret;
       } else {

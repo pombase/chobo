@@ -167,9 +167,10 @@ def: "A phenotype that is observed at the level of an individual cell, when the 
 comment: This is a high-level term whose primary purpose is to organize terms beneath it in the ontology, and we expect that it will not be used for direct annotations. Please consider using a more specific term to annotate each phenotype.
 subset: qc_do_not_annotate
 subset: qc_do_not_manually_annotate
-synonym: "cell phenotype during vegetative growth" EXACT [PomBase:mah]
-synonym: "fission yeast vegetative cell phenotype" EXACT [PomBase:mah]
+synonym: "cell phenotype during vegetative growth" NARROW
+synonym: "fission yeast vegetative cell phenotype" [PomBase:mah]
 synonym: "vegetative cell phenotype during vegetative growth" EXACT [PomBase:mah]
+synonym: "vegetative cell phenotype in vegetative growth" EXACT A_TYPE [PomBase:mah]
 is_a: FYPO:0000002 ! cell phenotype
 created_by: midori
 creation_date: 2012-08-01T13:52:18Z
