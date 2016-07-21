@@ -114,7 +114,7 @@ sub subsets
 {
   my $self = shift;
 
-  return @{$self->{subset}};
+  return @{$self->{subset} // []};
 }
 
 =head2 make_object

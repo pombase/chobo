@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 24;
+use Test::More tests => 25;
 use Test::Deep;
 
 use PomBase::Chobo::ParseOBO;
@@ -23,6 +23,8 @@ my $fypo_0000133 = $fypo_0000133_terms[0];
 
 is ($fypo_0000133->name(), $lookup_name);
 is ($fypo_0000133->id(), $lookup_id);
+
+cmp_deeply ([$fypo_0000133->subsets()], []);
 
 $fypo_0000133 = $ontology_data->get_term_by_id($lookup_id);
 
