@@ -105,6 +105,9 @@ our %field_conf = (
   part_of => {
     type => 'ARRAY',
   },
+  subset => {
+    type => 'ARRAY',
+  },
 #  xref => {
 #    type => 'ARRAY',
 #  },

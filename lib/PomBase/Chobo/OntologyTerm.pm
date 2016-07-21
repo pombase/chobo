@@ -54,7 +54,9 @@ has def => (is => 'ro', isa => 'Str');
 has namespace => (is => 'ro', isa => 'Str');
 has comment => (is => 'ro', isa => 'Str');
 has alt_id => (is => 'ro', isa => 'ArrayRef');
+has subset => (is => 'ro', isa => 'ArrayRef');
 has is_relationshiptype => (is => 'ro', isa => 'Bool');
+has is_obsolete => (is => 'ro', isa => 'Bool');
 has source_file => (is => 'ro', isa => 'Str', required => 1);
 has source_file_line_number => (is => 'ro', isa => 'Str', required => 1);
 has metadata => (is => 'ro');
@@ -106,6 +108,13 @@ sub alt_ids
       };
     }
   } @{$self->{alt_id} // []};
+}
+
+sub subsets
+{
+  my $self = shift;
+
+  return @{$self->{subset}};
 }
 
 =head2 make_object
