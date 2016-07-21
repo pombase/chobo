@@ -1,6 +1,8 @@
 Revision history for PomBase-Chobo
 
 {{$NEXT}}
+
+0.008     2016-07-21 20:24:28
           Doc fixes
           Fix term synonyms parsing and add a test for it
           Add subsets() and is_obsolete() methods to OntologyTerm
