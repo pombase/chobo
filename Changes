@@ -1,6 +1,8 @@
 Revision history for PomBase-Chobo
 
 {{$NEXT}}
+
+0.009     2016-07-21 20:34:13
           Fix parsing for stanzas that have no subset: lines
 
 0.008     2016-07-21 20:24:28
