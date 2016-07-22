@@ -186,6 +186,11 @@ my %row_makers = (
       }
 
       my $name = $term->name();
+
+      if ($term->is_obsolete()) {
+        $name .= ' (obsolete ' . $term->id() . ')';
+      }
+
       my $definition = $term->def();
       my $dbxref_id = $dbxref->{dbxref_id};
       my $is_relationshiptype = $term->{is_relationshiptype};

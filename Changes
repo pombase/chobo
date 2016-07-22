@@ -1,6 +1,7 @@
 Revision history for PomBase-Chobo
 
 {{$NEXT}}
+          Append "(obsolete)" to names of obsolete terms hen storing
 
 0.009     2016-07-21 20:34:13
           Fix parsing for stanzas that have no subset: lines

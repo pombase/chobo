@@ -155,10 +155,6 @@ sub make_object
     $accession = $object->{id};
   }
 
-  if ($object->{is_obsolete}) {
-    $object->{name} .= ' (obsolete ' . $object->{id} . ')'
-  }
-
   $object->{accession} = $accession;
   $object->{db_name} = $db_name;
 
