@@ -1,6 +1,8 @@
 Revision history for PomBase-Chobo
 
 {{$NEXT}}
+
+0.010     2016-08-11 11:18:33
           Append "(obsolete)" to names of obsolete terms hen storing
 
 0.009     2016-07-21 20:34:13
