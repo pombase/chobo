@@ -196,6 +196,15 @@ sub parse
           my $field_name = $bits[0];
           my $field_value = $bits[1];
 
+          # ignored for now
+          my $modifier_string;
+
+          if ($field_value =~ /\}$/) {
+            $field_value =~ s/(.*)\{(.*)\}$/$1/;
+            $modifier_string = $2;
+            $field_value =~ s/\s+$//;
+          }
+
           my $field_conf = $PomBase::Chobo::OntologyConf::field_conf{$field_name};
 
           if (defined $field_conf) {

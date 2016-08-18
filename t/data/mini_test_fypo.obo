@@ -38,7 +38,7 @@ namespace: fission_yeast_phenotype
 alt_id: FYPO:0000019
 def: "A cell phenotype characterized by altered cell morphology." [PomBase:mah]
 synonym: "cell morphology, misshapen cells" EXACT []
-is_a: FYPO:0000136 ! cellular structure phenotype
+is_a: FYPO:0000136 {some_modifier="true"} ! cellular structure phenotype
 intersection_of: PATO:0000051
 intersection_of: inheres_in CL:0000000 ! cell
 created_by: mah79
