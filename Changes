@@ -1,6 +1,8 @@
 Revision history for PomBase-Chobo
 
 {{$NEXT}}
+          Ignore trailing modifiers - See section "Trailing Modifiers" in:
+          ftp://ftp.geneontology.org/pub/go/www/GO.format.obo-1_4.shtml#S.1.4
 
 0.010     2016-08-11 11:18:33
           Append "(obsolete)" to names of obsolete terms hen storing
