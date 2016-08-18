@@ -1,6 +1,8 @@
 Revision history for PomBase-Chobo
 
 {{$NEXT}}
+
+0.011     2016-08-18 13:09:42
           Ignore trailing modifiers - See section "Trailing Modifiers" in:
           ftp://ftp.geneontology.org/pub/go/www/GO.format.obo-1_4.shtml#S.1.4
 
