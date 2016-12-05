@@ -7,6 +7,9 @@ database using PostgreSQL COPY.
 
 L<https://github.com/pombase/chobo>
 
+=head2 Build status
+
+=for html <a href="https://travis-ci.org/pombase/chobo"><img src="https://travis-ci.org/pombase/chobo.svg?branch=master"></a>
 
 =head1 Features
 
