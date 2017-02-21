@@ -3,6 +3,7 @@ Revision history for PomBase-Chobo
 {{$NEXT}}
 
 0.012     2017-02-22 11:36:03
+          Exit with a non-zero code when parsing or loading fails
 
 0.011     2016-08-18 13:09:42
           Ignore trailing modifiers - See section "Trailing Modifiers" in:
