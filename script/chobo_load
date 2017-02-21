@@ -79,11 +79,14 @@ try {
   if ($dry_run) {
     warn "dry run - rolling back\n";
     $dbh->rollback();
+    exit(1);
   } else {
     warn "commiting\n";
     $dbh->commit() or die $dbh->errstr;
+    exit(0);
   }
 } catch {
   warn "failed - rolling back: $_\n";
   $dbh->rollback() or die $dbh->errstr;
+  exit(2);
 };
