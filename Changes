@@ -1,6 +1,7 @@
 Revision history for PomBase-Chobo
 
 {{$NEXT}}
+          Bug fix: allow single character synonyms (eg. "I" from so-simple.obo)
 
 0.014     2018-02-13 23:43:39
           Allow escaped double quotes in synonyms - example from chebi.obo:
