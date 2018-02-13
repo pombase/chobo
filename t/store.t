@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 22;
+use Test::More tests => 24;
 use Test::Deep;
 
 use lib qw(t/lib);
@@ -74,6 +74,8 @@ $sth->execute();
 my $synonym_1 = $sth->fetchrow_hashref();
 my $synonym_2 = $sth->fetchrow_hashref();
 my $synonym_3 = $sth->fetchrow_hashref();
+my $synonym_4 = $sth->fetchrow_hashref();
+my $synonym_5 = $sth->fetchrow_hashref();
 
 cmp_deeply ($synonym_1,
             {
@@ -84,10 +86,22 @@ cmp_deeply ($synonym_1,
 cmp_deeply ($synonym_2,
             {
               type_id => $exact_term->{cvterm_id},
-              synonym => 'cyanidin 3-O-glucoside-yadda-yadda',
+              synonym => 'cyanidin 3-O-glucoside-yadda',
               cvterm_id => $cyanidin_term->{cvterm_id},
             });
 cmp_deeply ($synonym_3,
+            {
+              type_id => $exact_term->{cvterm_id},
+              synonym => 'cyanidin 3-O-glucoside-yadda-one',
+              cvterm_id => $cyanidin_term->{cvterm_id},
+            });
+cmp_deeply ($synonym_4,
+            {
+              type_id => $exact_term->{cvterm_id},
+              synonym => 'cyanidin 3-O-glucoside-yadda-three',
+              cvterm_id => $cyanidin_term->{cvterm_id},
+            });
+cmp_deeply ($synonym_5,
             {
               type_id => $exact_term->{cvterm_id},
               synonym => 'molecular function',
