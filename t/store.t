@@ -80,7 +80,7 @@ my $synonym_5 = $sth->fetchrow_hashref();
 cmp_deeply ($synonym_1,
             {
               type_id => $narrow_term->{cvterm_id},
-              synonym => 'cyanidin 3-O-glucoside-something',
+              synonym => 'cyanidin 3-O-glucoside-"something"',
               cvterm_id => $cyanidin_term->{cvterm_id},
             });
 cmp_deeply ($synonym_2,

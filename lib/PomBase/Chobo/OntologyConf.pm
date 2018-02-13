@@ -140,10 +140,12 @@ our %field_conf = (
     type => 'ARRAY',
     process => sub {
       my $val = shift;
-      if ($val =~ /^"(.+?)"\s*(.*)/) {
+      if ($val =~ /^"(.+?[^\\])"\s*(.*)/) {
         my $synonym = $1;
         my @dbxrefs = ();
         my $rest = $2;
+
+        $synonym =~ s/\\(.)/$1/g;
 
         my %ret = (
           synonym => $synonym,
