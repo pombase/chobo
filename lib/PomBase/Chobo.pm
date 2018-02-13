@@ -2,7 +2,7 @@ package PomBase::Chobo;
 
 =head1 NAME
 
-PomBase::Chobo - The great new PomBase::Chobo!
+PomBase::Chobo - Read an OBO file and store in a Chado database
 
 =cut
 
