@@ -31,7 +31,7 @@ cmp_deeply([
   sort {
     $a->{id} cmp $b->{id};
   } map {
-    { name => $_->{name}, id => $_->{id}, definition => $_->{def} }
+    { name => $_->{name}, id => $_->{id}, definition => $_->{def}->{definition} }
   } $ontology_data->get_terms()],
            [{ name => 'molecular_function', id => 'GO:0003674',
               definition => 'Elemental activities, such as catalysis or binding, describing the actions of a gene product at the molecular level. A given gene product may exhibit one or more molecular functions.' },

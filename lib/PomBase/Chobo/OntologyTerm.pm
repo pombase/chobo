@@ -283,7 +283,13 @@ sub to_string
     my @ret_lines = ();
 
     if (ref $value) {
-      for my $single_value (@$value) {
+      my @values;
+      if ($field_conf{$name}->{type} eq 'SINGLE_HASH') {
+        push @values, $value;
+      } else {
+        @values = @$value;
+      }
+      for my $single_value (@values) {
         my $to_string_proc = $field_conf{$name}->{to_string};
         my $value_as_string;
         if (defined $to_string_proc) {

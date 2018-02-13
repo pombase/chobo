@@ -218,7 +218,8 @@ sub parse
               }
             }
             if (defined $field_value) {
-              if (defined $field_conf->{type} && $field_conf->{type} eq 'SINGLE') {
+              if (defined $field_conf->{type} &&
+                  ($field_conf->{type} eq 'SINGLE' || $field_conf->{type} eq 'SINGLE_HASH')) {
                 $current->{$field_name} = $field_value;
               } else {
                 push @{$current->{$field_name}}, $field_value;

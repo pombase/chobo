@@ -51,11 +51,27 @@ our %field_conf = (
     }
   },
   def => {
-    type => 'SINGLE',
+    type => 'SINGLE_HASH',
     process => sub {
       my $val = shift;
-      $val =~ s/"(.*)".*/$1/g;
-      $val;
+      if ($val =~ /"(.*)"\s+\[(.*)\]/) {
+        my $definition = $1;
+        my $dbxrefs = $2;
+
+        my @dbxrefs = split /\s*,\s/, $dbxrefs;
+
+        return {
+          definition => $definition,
+          dbxrefs => \@dbxrefs,
+        }
+      } else {
+        croak qq(failed to parse "def:" line: $val);
+      }
+    },
+    to_string => sub {
+      my $val = shift;
+      my $ret_string = $val->{definition};
+      $ret_string .= ' [' . (join ", ", @{$val->{dbxrefs}}) . ']';
     }
   },
   comment => {
