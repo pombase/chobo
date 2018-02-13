@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 19;
+use Test::More tests => 22;
 use Test::Deep;
 
 use lib qw(t/lib);
@@ -42,6 +42,8 @@ cmp_deeply([
 my $sth = $fake_handle->prepare("select cvterm_id, definition, name, cv_id from cvterm order by name");
 $sth->execute();
 
+my $cv_version_term = $sth->fetchrow_hashref();
+is ($cv_version_term->{name}, 'cv_version');
 my $cyanidin_term = $sth->fetchrow_hashref();
 is ($cyanidin_term->{name}, $cyanidin_name);
 is ($cyanidin_term->{definition}, $cyanidin_def);
@@ -115,4 +117,13 @@ is ($sth->fetchrow_hashref(), undef);
 
 
 is($cvterm_dbxref->{cvterm_id}, $molecular_function_term->{cvterm_id});
+
+
+my $chado_data = PomBase::Chobo::ChadoData->new(dbh => $fake_handle);
+
+my @cv_version_values = $chado_data->get_cvprop_values('molecular_function', 'cv_version');
+
+is(scalar(@cv_version_values), 1);
+is($cv_version_values[0], 'releases/2016-05-07');
+
 

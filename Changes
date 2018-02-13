@@ -1,6 +1,7 @@
 Revision history for PomBase-Chobo
 
 {{$NEXT}}
+          Store the data-version from the OBO file in the cvprop table
 
 0.012     2017-02-22 11:36:03
           Exit with a non-zero code when parsing or loading fails

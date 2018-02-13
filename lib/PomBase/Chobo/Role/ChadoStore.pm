@@ -282,6 +282,31 @@ my %row_makers = (
       }
     } $ontology_data->relationships();
   },
+  cvprop => sub {
+    my $ontology_data = shift;
+    my $chado_data = shift;
+
+    my @namespaces = $ontology_data->get_namespaces();
+
+    my $cv_version_term = $chado_data->get_cvterm_by_name('cv_property_type', 'cv_version');
+
+    map {
+      my $namespace = $_;
+
+      my $metadata = $ontology_data->get_metadata_by_namespace($namespace);
+      my $cv_version = $metadata->{'data-version'} || $metadata->{'date'};;
+
+      if ($cv_version) {
+        my $cv = $chado_data->get_cv_by_name($namespace);
+        my $cv_id = $cv->{cv_id};
+
+        [$cv_id, $cv_version_term->{cvterm_id}, $cv_version];
+      } else {
+        ();
+      }
+    } @namespaces
+  },
+
 );
 
 my %table_column_names = (
@@ -292,6 +317,7 @@ my %table_column_names = (
   cvtermsynonym => [qw(cvterm_id synonym type_id)],
   cvterm_dbxref => [qw(cvterm_id dbxref_id)],
   cvterm_relationship => [qw(subject_id type_id object_id)],
+  cvprop => [qw(cv_id type_id value)],
 );
 
 sub chado_store
@@ -303,7 +329,7 @@ sub chado_store
   my @cvterm_column_names =
     @PomBase::Chobo::ChadoData::cvterm_column_names;
 
-  my @tables_to_store = qw(db dbxref cv cvterm cvtermsynonym cvterm_dbxref cvterm_relationship);
+  my @tables_to_store = qw(db dbxref cv cvterm cvtermsynonym cvterm_dbxref cvterm_relationship cvprop);
 
   for my $table_to_store (@tables_to_store) {
     my $chado_data = PomBase::Chobo::ChadoData->new(dbh => $self->dbh());

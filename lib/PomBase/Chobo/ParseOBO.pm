@@ -131,6 +131,7 @@ my %interesting_metadata = (
   'default-namespace' => 1,
   'ontology' => 1,
   'date' => 1,
+  'data-version' => 1,
 );
 
 sub parse
