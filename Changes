@@ -1,6 +1,8 @@
 Revision history for PomBase-Chobo
 
 {{$NEXT}}
+          Allow escaped double quotes in synonyms - example from chebi.obo:
+          "alpha-GalCer-6\"-(4-chlorophenyl)carbamate" RELATED [ChEBI:]
 
 0.013     2018-02-13 20:22:12
           Store the data-version from the OBO file in the cvprop table
