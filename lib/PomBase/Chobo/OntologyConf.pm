@@ -54,7 +54,7 @@ our %field_conf = (
     type => 'SINGLE_HASH',
     process => sub {
       my $val = shift;
-      if ($val =~ /"(.*)"(\s+\[(.*)\])?/) {
+      if ($val =~ /"(.*)"(?:\s+\[(.*)\])?/) {
         my $definition = $1;
         my $dbxrefs = $2 // '';
 
