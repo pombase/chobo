@@ -1,6 +1,8 @@
 Revision history for PomBase-Chobo
 
 {{$NEXT}}
+
+0.017     2018-02-14 17:28:35
           Fix bug handling odd dbxrefs that have no accession
 
 0.016     2018-02-14 17:16:01
