@@ -150,6 +150,9 @@ my %row_makers = (
 
       map {
         my $accession = $_;
+        if (!defined $accession) {
+          die "accession is null for accession in db: $db_name\n";
+        }
         [$db_id, $accession];
       } @ont_db_termids;
     } $ontology_data->get_db_names();
