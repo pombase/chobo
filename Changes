@@ -1,6 +1,7 @@
 Revision history for PomBase-Chobo
 
 {{$NEXT}}
+          Store dbxrefs for term definitions
 
 0.015     2018-02-14 11:05:39
           Bug fix: allow single character synonyms (eg. "I" from so-simple.obo)
