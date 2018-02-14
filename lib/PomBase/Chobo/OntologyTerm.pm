@@ -205,7 +205,8 @@ sub merge
     my $field_conf = $PomBase::Chobo::OntologyConf::field_conf{$name};
 
     if (defined $field_conf) {
-      if (defined $field_conf->{type} && $field_conf->{type} eq 'SINGLE') {
+      if (defined $field_conf->{type} &&
+            ($field_conf->{type} eq 'SINGLE' || $field_conf->{type} eq 'SINGLE_HASH')) {
         my $res = undef;
         if (defined $field_conf->{merge}) {
           $res = $field_conf->{merge}->($self, $other_term);
