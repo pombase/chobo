@@ -1,6 +1,8 @@
 Revision history for PomBase-Chobo
 
 {{$NEXT}}
+
+0.016     2018-02-14 17:16:01
           Store dbxrefs for term definitions
 
 0.015     2018-02-14 11:05:39
