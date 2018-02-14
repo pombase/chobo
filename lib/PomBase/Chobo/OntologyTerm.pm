@@ -134,6 +134,10 @@ sub make_object
     croak "no argument passed to new()";
   }
 
+  if ($object->{is_obsolete} && $object->{name} && $object->{name} !~ /^obsolete/i) {
+    $object->{name} = "OBSOLETE " . $object->{id} . " " . $object->{name};
+  }
+
   if ($object->{is_relationshiptype} && $object->{name}) {
     $object->{name} =~ s/ /_/g;
   }
