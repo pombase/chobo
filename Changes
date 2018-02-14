@@ -1,6 +1,7 @@
 Revision history for PomBase-Chobo
 
 {{$NEXT}}
+          Fixes several bugs we storing dbxrefs from "def:" lines
 
 0.017     2018-02-14 17:28:35
           Fix bug handling odd dbxrefs that have no accession
