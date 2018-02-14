@@ -134,7 +134,7 @@ sub make_object
     croak "no argument passed to new()";
   }
 
-  if ($object->{is_relationshiptype}) {
+  if ($object->{is_relationshiptype} && $object->{name}) {
     $object->{name} =~ s/ /_/g;
   }
 

@@ -45,6 +45,7 @@ use Mouse;
 use Clone qw(clone);
 use Try::Tiny;
 use Carp;
+use List::Util qw(uniq);
 
 use PomBase::Chobo::OntologyTerm;
 
@@ -136,6 +137,18 @@ sub add
       $terms_by_id->{$id_details->{id}} = $term;
 
       $self->terms_by_db_name()->{$id_details->{db_name}}->{$id_details->{accession}} = $term;
+
+      my $def = $term->def();
+
+      map {
+        my $def_dbxref = $_;
+        if ($def_dbxref =~ /^(.+?):(.*)/) {
+          my ($def_db_name, $def_accession) = ($1, $2);
+          $self->terms_by_db_name()->{$def_db_name}->{$def_accession} = $term;
+        } else {
+          die qq(can't parse dbxref from "def:" line: $def_dbxref);
+        }
+      } @{$def->{dbxrefs}};
     }
 
     my $name = $term->{name};

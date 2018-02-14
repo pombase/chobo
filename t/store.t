@@ -122,16 +122,20 @@ while (defined (my $dbxref = $sth->fetchrow_hashref())) {
   }
 }
 
-
 $sth = $fake_handle->prepare("select cvterm_id, dbxref_id from cvterm_dbxref order by cvterm_id");
 $sth->execute();
 
-my $cvterm_dbxref = $sth->fetchrow_hashref();
+my @cvterm_dbxrefs = ();
+
+push @cvterm_dbxrefs, $sth->fetchrow_hashref();
+push @cvterm_dbxrefs, $sth->fetchrow_hashref();
+push @cvterm_dbxrefs, $sth->fetchrow_hashref();
+
 is ($sth->fetchrow_hashref(), undef);
 
-
-is($cvterm_dbxref->{cvterm_id}, $molecular_function_term->{cvterm_id});
-
+ok(scalar(grep {
+  $_->{cvterm_id} == $molecular_function_term->{cvterm_id};
+} @cvterm_dbxrefs) == 2);
 
 my $chado_data = PomBase::Chobo::ChadoData->new(dbh => $fake_handle);
 

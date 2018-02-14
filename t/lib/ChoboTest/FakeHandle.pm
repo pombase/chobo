@@ -77,7 +77,7 @@ has storage => (is => 'rw', isa => 'HashRef',
                     cvterm_dbxref => {
                       id_counter => 701,
                       column_names => [
-                        'cvterm_dbxref_id', 'cvterm_id', 'dbxref_id',
+                        'cvterm_dbxref_id', 'cvterm_id', 'dbxref_id', 'is_for_definition',
                       ],
                       rows => [
                       ],

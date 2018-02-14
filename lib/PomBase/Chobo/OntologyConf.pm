@@ -58,7 +58,10 @@ our %field_conf = (
         my $definition = $1;
         my $dbxrefs = $2;
 
-        my @dbxrefs = split /\s*,\s/, $dbxrefs;
+        my @dbxrefs =
+          grep {
+            !m|^http:|;
+          } split /\s*,\s/, $dbxrefs;
 
         return {
           definition => $definition,

@@ -38,7 +38,8 @@ under the same terms as Perl itself.
 # VERSION
 
 use Mouse::Role;
-use Text::CSV::Encoded
+use Text::CSV::Encoded;
+use Carp;
 
 requires 'dbh';
 requires 'ontology_data';
@@ -191,7 +192,10 @@ my %row_makers = (
         $name .= ' (obsolete ' . $term->id() . ')';
       }
 
-      my $definition = $term->def()->{definition};
+      my $definition = undef;
+      if (defined $term->def()) {
+        $definition = $term->def()->{definition};
+      }
       my $dbxref_id = $dbxref->{dbxref_id};
       my $is_relationshiptype = $term->{is_relationshiptype};
       my $is_obsolete = $term->{is_obsolete} ? 1 : 0;
@@ -231,19 +235,43 @@ my %row_makers = (
     my $ontology_data = shift;
     my $chado_data = shift;
 
+    my %seen_cvterm_dbxrefs = ();
+
     map {
       my $term = $_;
 
-      map {
-        my $alt_id = $_;
+      my $helper = sub {
+        my $id = shift;
+        my $is_for_definition = shift;
 
         my $cvterm_id = $chado_data->get_cvterm_by_termid($term->id())->cvterm_id();
-        my $dbxref_details = $chado_data->get_dbxref_by_termid($alt_id->{id});
+        my $dbxref_details = $chado_data->get_dbxref_by_termid($id);
+
+        if (!defined $dbxref_details) {
+          use Data::Dumper;
+          die "$id: ", Dumper([$dbxref_details]);
+        }
 
         my $dbxref_id = $dbxref_details->{dbxref_id};
 
-        [$cvterm_id, $dbxref_id];
-      } $term->alt_ids();
+        my $key = "$cvterm_id - $dbxref_id";
+        if (exists $seen_cvterm_dbxrefs{$key}) {
+          use Data::Dumper;
+          warn "not storing duplicate cvterm_dbxref for ", $dbxref_details->{termid};
+          ()
+        } else {
+          $seen_cvterm_dbxrefs{$key} = $is_for_definition;
+          [$cvterm_id, $dbxref_id, $is_for_definition]
+        }
+      };
+
+      my @ret = map { $helper->($_->{id}, 0) } $term->alt_ids();
+
+      if ($term->def()) {
+        push @ret, map { $helper->($_, 1) } @{$term->def()->{dbxrefs}}
+      }
+
+      @ret;
     } $ontology_data->get_terms();
   },
   cvterm_relationship => sub {
@@ -273,11 +301,13 @@ my %row_makers = (
 
           [$subject_id, $rel_id, $object_id]
         } else {
-          warn "no Chado cvterm for $object_termid - ignoring relation\n";
+          warn "no Chado cvterm for $object_termid - ignoring relation:\n" .
+            "  $subject_termid <-$rel_name_or_id-> $object_termid\n";
           ();
         }
       } else {
-        warn "no Chado cvterm for $subject_termid - ignoring relation\n";
+        warn "no Chado cvterm for $subject_termid - ignoring relation:\n" .
+            "  $subject_termid <-$rel_name_or_id-> $object_termid\n";
         ();
       }
     } $ontology_data->relationships();
@@ -315,7 +345,7 @@ my %table_column_names = (
   cv => [qw(name)],
   cvterm => [qw(name definition cv_id dbxref_id is_relationshiptype is_obsolete)],
   cvtermsynonym => [qw(cvterm_id synonym type_id)],
-  cvterm_dbxref => [qw(cvterm_id dbxref_id)],
+  cvterm_dbxref => [qw(cvterm_id dbxref_id is_for_definition)],
   cvterm_relationship => [qw(subject_id type_id object_id)],
   cvprop => [qw(cv_id type_id value)],
 );
