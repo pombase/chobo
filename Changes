@@ -1,6 +1,7 @@
 Revision history for PomBase-Chobo
 
 {{$NEXT}}
+          Warn if "def:" lines differ when merging terms
 
 0.019     2018-02-16 18:10:46
           Require a version of List::Util that has the uniq() function to

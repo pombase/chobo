@@ -71,6 +71,24 @@ our %field_conf = (
         croak qq(failed to parse "def:" line: $val);
       }
     },
+    merge => sub {
+      my $self = shift;
+      my $other = shift;
+
+      if (!defined $other->def()) {
+        return $self;
+      } else {
+        if (!defined $self->def()) {
+          return $other->def();
+        } else {
+          if ($self->def()->{definition} ne $other->def()->{definition}) {
+            warn qq("def:" line differ\n  ) . $self->def()->{definition} . "\nversus:\n  " .
+              $other->def()->{definition};
+          }
+          return $self->def();
+        }
+      }
+    },
     to_string => sub {
       my $val = shift;
       my $ret_string = $val->{definition};
