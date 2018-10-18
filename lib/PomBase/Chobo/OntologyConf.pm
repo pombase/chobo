@@ -60,7 +60,7 @@ our %field_conf = (
 
         my @dbxrefs =
           grep {
-            !m|^http:| && /^\S+:\S+$/;
+            !m|^(?:url:)?https?\\?:| && /^\S+:\S+$/;
           } split /\s*,\s/, $dbxrefs;
 
         return {

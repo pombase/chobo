@@ -1,6 +1,7 @@
 Revision history for PomBase-Chobo
 
 {{$NEXT}}
+          Fixes to cope with the disease ontology OBO file
 
 0.021     2018-02-20 18:06:18
           Require an even more recent version of List::Util to prevent
