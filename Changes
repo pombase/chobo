@@ -1,6 +1,8 @@
 Revision history for PomBase-Chobo
 
 {{$NEXT}}
+
+0.024     2018-10-26 08:29:17
           Require Clone version 0.41 to avoid crash
 
 0.023     2018-10-25 16:40:14
