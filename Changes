@@ -1,6 +1,8 @@
 Revision history for PomBase-Chobo
 
 {{$NEXT}}
+
+0.023     2018-10-25 16:40:14
           Remove dependency on List::Util
 
 0.022     2018-10-19 11:27:38
