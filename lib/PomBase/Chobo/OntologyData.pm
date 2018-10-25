@@ -45,7 +45,6 @@ use Mouse;
 use Clone qw(clone);
 use Try::Tiny;
 use Carp;
-use List::Util qw(uniq);
 
 use PomBase::Chobo::OntologyTerm;
 

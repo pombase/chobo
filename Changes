@@ -1,6 +1,7 @@
 Revision history for PomBase-Chobo
 
 {{$NEXT}}
+          Remove dependency on List::Util
 
 0.022     2018-10-19 11:27:38
           Fixes to cope with the disease ontology OBO file
