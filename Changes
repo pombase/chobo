@@ -1,6 +1,7 @@
 Revision history for PomBase-Chobo
 
 {{$NEXT}}
+          Require Clone version 0.41 to avoid crash
 
 0.023     2018-10-25 16:40:14
           Remove dependency on List::Util
