@@ -64,6 +64,10 @@ sub _finish_stanza
     return;
   }
 
+  if ($current->{is_obsolete}) {
+    delete $current->{alt_id};
+  }
+
   $current->{metadata} = $metadata_ref;
   $current->{source_file} = $filename;
   $current->{relationship} //= [];
