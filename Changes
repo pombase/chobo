@@ -1,6 +1,8 @@
 Revision history for PomBase-Chobo
 
 {{$NEXT}}
+          Ignore alt_ids on obsolete terms
+          See: https://github.com/pombase/chobo/issues/14
 
 0.024     2018-10-26 08:29:17
           Require Clone version 0.41 to avoid crash
