@@ -20,8 +20,8 @@ jobs:
            sudo cpanm --quiet --notest --skip-satisfied Dist::Zilla
            dzil authordeps | grep -vP '[^\w:]' | xargs -n 5 -P 10 sudo cpanm --quiet --notest --skip-satisfied
            export RELEASE_TESTING=1 AUTOMATED_TESTING=1 AUTHOR_TESTING=1 HARNESS_OPTIONS=j10:c HARNESS_TIMER=1
-           dzil listdeps | grep -vP '[^\w:]' | cpanm --quiet --notest --skip-satisfied
-          
+           dzil listdeps | grep -vP '[^\w:]' | sudo cpanm --quiet --notest --skip-satisfied
+
       - name: Test
         run: |
           dzil smoke --release --author
