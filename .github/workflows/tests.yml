@@ -1,0 +1,27 @@
+name: Tests
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install
+        run: |
+           git config --global user.name "GitHub Actions"
+           cpanm --quiet --notest --skip-satisfied Dist::Zilla
+           dzil authordeps | grep -vP '[^\w:]' | xargs -n 5 -P 10 cpanm --quiet --notest --skip-satisfied
+           export RELEASE_TESTING=1 AUTOMATED_TESTING=1 AUTHOR_TESTING=1 HARNESS_OPTIONS=j10:c HARNESS_TIMER=1
+           dzil listdeps | grep -vP '[^\w:]' | cpanm --quiet --notest --skip-satisfied
+          
+      - name: Test
+        run: |
+          dzil smoke --release --author
+
