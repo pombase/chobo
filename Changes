@@ -1,6 +1,7 @@
 Revision history for PomBase-Chobo
 
 {{$NEXT}}
+          Catch colon at start or end of relationship name
 
 0.026     2018-11-01 17:15:07
           Don't merge an obsolete term with a non-obsolete using alt_id
