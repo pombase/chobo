@@ -154,9 +154,17 @@ our %field_conf = (
       my $val = shift;
 
       if ($val =~ /^\s*(\S+)\s+(\S+)\s*(?:\{(.*)\})?$/) {
+        my $relationship_name = $1;
+        my $other_term = $2;
+
+        if ($relationship_name =~ /^:|:$/) {
+          warn "illegal relationship name: $relationship_name\n";
+          return undef;
+        }
+
         return {
-          relationship_name => $1,
-          other_term => $2,
+          relationship_name => $relationship_name,
+          other_term => $other_term,
         };
       } else {
         warn "can't parse relationship: $val\n";
