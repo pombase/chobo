@@ -1,6 +1,8 @@
 Revision history for PomBase-Chobo
 
 {{$NEXT}}
+
+0.028     2020-12-16 12:20:19
           Remove backslash escapes in dbxref accessions
 
 0.027     2020-12-11 16:06:38
