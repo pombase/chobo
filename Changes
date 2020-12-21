@@ -1,6 +1,7 @@
 Revision history for PomBase-Chobo
 
 {{$NEXT}}
+          Fix check for duplicate cvterm definition dbxrefs
 
 0.028     2020-12-16 12:20:19
           Remove backslash escapes in dbxref accessions

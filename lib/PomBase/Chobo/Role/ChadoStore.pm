@@ -262,7 +262,9 @@ my %row_makers = (
           warn "not storing duplicate cvterm_dbxref for ", $dbxref_details->{termid};
           ()
         } else {
-          $seen_cvterm_dbxrefs{$key} = $is_for_definition;
+          if ($is_for_definition) {
+            $seen_cvterm_dbxrefs{$key} = 1;
+          }
           [$cvterm_id, $dbxref_id, $is_for_definition]
         }
       };
