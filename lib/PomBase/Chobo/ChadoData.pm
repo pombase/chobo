@@ -334,7 +334,7 @@ sub get_cvprop_values
 
   my $cv = $self->get_cv_by_name($cv_name);
   my $cvprops = $self->cvprop_data()->{$cv->{cv_id}};
-  my $prop_type = $self->get_cvterm_by_name($cv_name, $prop_type_name);
+  my $prop_type = $self->get_cvterm_by_name('cv_property_type', $prop_type_name);
 
   return map {
     $_->{value}
