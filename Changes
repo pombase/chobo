@@ -2,6 +2,9 @@ Revision history for PomBase-Chobo
 
 {{$NEXT}}
 
+0.031     2020-12-24 13:52:54
+          Store the "replaced_by" property as a cvtermprop
+
 0.030     2020-12-24 13:34:14
           Fix bug caused by de-quoting change in v0.028
 
