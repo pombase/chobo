@@ -103,6 +103,9 @@ our %field_conf = (
   comment => {
     type => 'SINGLE',
   },
+  replaced_by => {
+    type => 'SINGLE',
+  },
   is_obsolete => {
     type => 'SINGLE',
     process => sub {
