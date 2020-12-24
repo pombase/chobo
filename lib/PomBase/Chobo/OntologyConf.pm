@@ -59,6 +59,11 @@ our %field_conf = (
         my $dbxrefs = $2 // '';
 
         my @dbxrefs =
+          map {
+            # remove quoting
+            s|\\(.)|$1|g;
+            $_;
+          }
           grep {
             !m|^(?:url:)?https?\\?:| && /^\S+:\S+$/;
           } split /\s*,\s/, $dbxrefs;

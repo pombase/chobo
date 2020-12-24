@@ -153,7 +153,6 @@ my %row_makers = (
         if (!defined $accession) {
           die "accession is null for accession in db: $db_name\n";
         }
-        $accession =~ s|\\(.)|$1|g;
         [$db_id, $accession];
       } @ont_db_termids;
     } $ontology_data->get_db_names();
@@ -252,7 +251,7 @@ my %row_makers = (
         my $dbxref_details = $chado_data->get_dbxref_by_termid($id);
 
         if (!defined $dbxref_details) {
-          die "no dbxref details for $id";
+          die "no dbxref details for $id ", $term->name(), "\n";
         }
 
         my $dbxref_id = $dbxref_details->{dbxref_id};
