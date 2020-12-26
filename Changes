@@ -2,6 +2,10 @@ Revision history for PomBase-Chobo
 
 {{$NEXT}}
 
+0.032     2020-12-26 20:32:43
+          Filter alt_ids from the definition xrefs to avoid
+          duplicate key violations 
+
 0.031     2020-12-24 13:52:54
           Store the "replaced_by" property as a cvtermprop
 
