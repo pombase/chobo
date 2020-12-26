@@ -135,6 +135,19 @@ sub make_object
     croak "no argument passed to new()";
   }
 
+  if ($object->{def} && $object->{def}->{dbxrefs} && $object->{alt_id}) {
+    for my $alt_id (@{$object->{alt_id}}) {
+      # filter alt_ids from the definition xrefs to avoid:
+      #   duplicate key value violates unique constraint "cvterm_dbxref_c1"
+      # see also: https://github.com/kimrutherford/go-ontology/commit/92dca313a69ffb073c226b94242faa8f321efcf2
+      @{$object->{def}->{dbxrefs}} =
+        grep {
+          my $xref = $_;
+          $alt_id ne $xref;
+        } @{$object->{def}->{dbxrefs}};
+    }
+  }
+
   if ($object->{is_obsolete} && $object->{name} && $object->{name} !~ /^obsolete/i) {
     $object->{name} = "OBSOLETE " . $object->{id} . " " . $object->{name};
   }
