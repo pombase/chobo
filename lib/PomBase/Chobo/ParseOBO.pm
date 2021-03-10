@@ -59,6 +59,10 @@ sub _finish_stanza
   my $terms_ref = shift;
   my $metadata_ref = shift;
 
+  if ($current->{is_obsolete} && $current->{is_relationshiptype}) {
+    return;
+  }
+
   if (!defined $current->{id}) {
     die_line $filename,  $current->{line}, "stanza has no id\n";
     return;
