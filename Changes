@@ -1,6 +1,7 @@
 Revision history for PomBase-Chobo
 
 {{$NEXT}}
+          Store the "consider" attribute as a cvtermprop
 
 0.033     2021-03-19 16:06:08
           Don't load obsolete relation terms
