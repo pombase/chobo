@@ -1,6 +1,8 @@
 Revision history for PomBase-Chobo
 
 {{$NEXT}}
+
+0.035     2021-12-21 16:24:41
           When merging terms, fix garbage generated when one of the
           terms has no definition
 
