@@ -81,7 +81,7 @@ our %field_conf = (
       my $other = shift;
 
       if (!defined $other->def()) {
-        return $self;
+        return $self->def();
       } else {
         if (!defined $self->def()) {
           return $other->def();
