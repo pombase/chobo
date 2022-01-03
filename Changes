@@ -1,6 +1,7 @@
 Revision history for PomBase-Chobo
 
 {{$NEXT}}
+          Add special case to make sure that all part_of terms are merged
 
 0.035     2021-12-21 16:24:41
           When merging terms, fix garbage generated when one of the
