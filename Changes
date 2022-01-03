@@ -1,6 +1,8 @@
 Revision history for PomBase-Chobo
 
 {{$NEXT}}
+
+0.036     2022-01-04 10:15:23
           Add special case to make sure that all part_of terms are merged
 
 0.035     2021-12-21 16:24:41
