@@ -59,6 +59,7 @@ has is_relationshiptype => (is => 'ro', isa => 'Bool');
 has is_obsolete => (is => 'ro', isa => 'Bool');
 has replaced_by => (is => 'ro', isa => 'Str');
 has consider => (is => 'ro', isa => 'Str');
+has property_value => (is => 'ro', isa => 'ArrayRef');
 has source_file => (is => 'ro', isa => 'Str', required => 1);
 has source_file_line_number => (is => 'ro', isa => 'Str', required => 1);
 has metadata => (is => 'ro');
@@ -110,6 +111,13 @@ sub alt_ids
       };
     }
   } @{$self->{alt_id} // []};
+}
+
+sub property_values
+{
+  my $self = shift;
+
+  return @{$self->{property_value} // []};
 }
 
 sub subsets
