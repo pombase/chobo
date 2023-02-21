@@ -165,7 +165,7 @@ sub parse
 
   my %meta = ();
 
-  my $fh = FileHandle->new($filename, 'r') or die "can't open $filename: $!";
+  open my $fh, '<:utf8', $filename or die "can't open $filename: $!";
 
   my $line_number = 0;;
 

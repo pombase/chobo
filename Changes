@@ -1,6 +1,7 @@
 Revision history for PomBase-Chobo
 
 {{$NEXT}}
+          Fix handling of UTF-8 encoded OBO files
 
 0.037     2022-04-02 16:37:50
           Store feature_field fields in cvtermprops
