@@ -152,6 +152,17 @@ sub add
       }
     } @{$def->{dbxrefs}};
 
+    map {
+      my $xref = $_;
+
+      if ($xref =~ /^(.+?):(.*)/) {
+        my ($def_db_name, $def_accession) = ($1, $2);
+        $self->terms_by_db_name()->{$def_db_name}->{$def_accession} = $term;
+      } else {
+        die qq(can't parse "xref:" line: $xref);
+      }
+    } $term->xrefs();
+
     my $name = $term->{name};
 
     if (defined $name) {

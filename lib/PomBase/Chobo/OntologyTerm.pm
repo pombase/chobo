@@ -54,6 +54,7 @@ has def => (is => 'ro', isa => 'Str');
 has namespace => (is => 'ro', isa => 'Str');
 has comment => (is => 'ro', isa => 'Str');
 has alt_id => (is => 'ro', isa => 'ArrayRef');
+has xref => (is => 'ro', isa => 'ArrayRef');
 has subset => (is => 'ro', isa => 'ArrayRef');
 has is_relationshiptype => (is => 'ro', isa => 'Bool');
 has is_obsolete => (is => 'ro', isa => 'Bool');
@@ -125,6 +126,13 @@ sub subsets
   my $self = shift;
 
   return @{$self->{subset} // []};
+}
+
+sub xrefs
+{
+  my $self = shift;
+
+  return @{$self->{xref} // []};
 }
 
 =head2 make_object

@@ -156,9 +156,18 @@ our %field_conf = (
   subset => {
     type => 'ARRAY',
   },
-#  xref => {
-#    type => 'ARRAY',
-#  },
+  xref => {
+    type => 'ARRAY',
+    process => sub {
+      my $val = shift;
+
+      if ($val =~ /^([^\s:]+:[^\s]+)(?:$|\s)/) {
+        return $1;
+      } else {
+        return undef;
+      }
+    },
+  },
   relationship => {
     type => 'ARRAY',
     process => sub {
