@@ -63,6 +63,11 @@ sub _finish_stanza
     return;
   }
 
+  if (!defined $current->{name}) {
+    warn "term without a name tag ignored: ", $current->{id}, "\n";
+    return;
+  }
+
   if (!defined $current->{id}) {
     die_line $filename,  $current->{line}, "stanza has no id\n";
     return;
