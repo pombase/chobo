@@ -1,6 +1,8 @@
 Revision history for PomBase-Chobo
 
 {{$NEXT}}
+          Fix merging of relations; if possible use the relation ID
+          that looks like an ID (has a colon)
 
 0.040     2024-06-06 16:17:14
           Fix merging bug when an alt_id matches an obsolete term

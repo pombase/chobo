@@ -90,9 +90,25 @@ sub _get_relationship_terms
 
   my @cvterm_data = $chado_data->get_all_cvterms();
 
-  my @rel_terms = grep {
-    $_->is_relationshiptype();
-  } @cvterm_data;
+  my @rel_terms =
+    sort {
+      if ($a->{id} =~ /:/) {
+        if ($b->{id} =~ /:/) {
+          $a->{id} cmp $b->{id};
+        } else {
+          -1;
+        }
+      } else {
+        if ($b->{id} =~ /:/) {
+          1;
+        } else {
+          $a->{id} cmp $b->{id};
+        }
+      }
+    }
+    grep {
+      $_->is_relationshiptype();
+    } @cvterm_data;
 
   my %terms_by_name = ();
   my %terms_by_termid = ();
