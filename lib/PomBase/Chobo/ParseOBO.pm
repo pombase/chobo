@@ -73,6 +73,26 @@ sub _finish_stanza
     return;
   }
 
+  if ($current->{id} !~ /:/) {
+    # try to find a sensible ID if the ID looks like a name ("id: output_of")
+    if ($current->{xref}) {
+      for my $xref (@{$current->{xref}}) {
+        if ($xref =~ /^RO:/) {
+          $current->{id} = $xref;
+          goto ID_FIXED
+        }
+      }
+
+      for my $xref (@{$current->{xref}}) {
+        if ($xref =~ /^BFO:/) {
+          $current->{id} = $xref;
+          goto ID_FIXED
+        }
+      }
+    }
+  }
+
+  ID_FIXED:
   if ($current->{is_obsolete}) {
     delete $current->{alt_id};
   }
