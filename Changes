@@ -1,6 +1,8 @@
 Revision history for PomBase-Chobo
 
 {{$NEXT}}
+
+0.041     2025-08-18 17:25:10
           Fix merging of relations; if possible use the relation ID
           that looks like an ID (has a colon)
 
